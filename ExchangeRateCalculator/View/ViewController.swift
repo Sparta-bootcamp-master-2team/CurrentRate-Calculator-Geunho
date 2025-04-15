@@ -31,7 +31,6 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(#function)
         
         setUI()
         setLayout()
@@ -81,9 +80,6 @@ class ViewController: UIViewController {
             
             switch result {
             case .success(let exchangeResponse):
-                for item in exchangeResponse.rates {
-                    print(item)
-                }
                 self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
                     .sorted { $0.currencyCode < $1.currencyCode }
                 DispatchQueue.main.async {

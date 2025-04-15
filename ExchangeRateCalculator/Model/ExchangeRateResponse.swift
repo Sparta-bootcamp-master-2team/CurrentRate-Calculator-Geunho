@@ -17,3 +17,8 @@ struct ExchangeRateResponse: Codable {
         case rates
     }
 }
+
+struct RateItem {
+    let currencyCode: String
+    let value: Double
+}

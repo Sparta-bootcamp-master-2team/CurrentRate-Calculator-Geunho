@@ -21,6 +21,9 @@ struct ExchangeRateResponse: Codable {
 struct RateItem {
     let currencyCode: String
     let value: Double
+}
+
+struct Countries {
     let country = [
         "USD": "미국",
         "AED": "아랍에미리트",
@@ -187,4 +190,3 @@ struct RateItem {
         "ZWL": "짐바브웨"
     ]
 }
-

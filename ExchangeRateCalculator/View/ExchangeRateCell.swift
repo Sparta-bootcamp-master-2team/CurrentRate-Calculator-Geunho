@@ -86,7 +86,7 @@ class ExchangeRateCell: UITableViewCell {
     func configureCell(rateItem: RateItem) {
         currencyLabel.text = rateItem.currencyCode
         rateLabel.text = String(format: "%.4f", rateItem.value)
-        countryLabel.text = rateItem.country[rateItem.currencyCode]
+        countryLabel.text = Countries().country[rateItem.currencyCode]
     }
     
 

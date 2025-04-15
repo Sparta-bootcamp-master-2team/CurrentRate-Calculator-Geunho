@@ -13,6 +13,13 @@ class ViewController: UIViewController {
     
     var rateItems = [RateItem]()
     
+    private lazy var searchBar: UISearchBar = {
+        let bar = UISearchBar()
+        bar.placeholder = "통화 검색"
+        bar.searchBarStyle = .minimal
+        return bar
+    }()
+    
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.delegate = self
@@ -34,12 +41,21 @@ class ViewController: UIViewController {
     private func setUI() {
         view.backgroundColor = .systemBackground
         
-        view.addSubview(tableView)
+        [searchBar, tableView].forEach {
+            view.addSubview($0)
+        }
     }
     
     private func setLayout() {
+        
+        searchBar.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.leading.trailing.equalToSuperview()
+        }
+        
         tableView.snp.makeConstraints { make in
-            make.edges.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(searchBar.snp.bottom)
+            make.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
     

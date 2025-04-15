@@ -16,7 +16,7 @@ class ViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         // 테이블 뷰에다가 테이블 뷰 셀 등록
-        tableView.register(RatesCell.self, forCellReuseIdentifier: RatesCell.id)
+        tableView.register(ExchangeRateCell.self, forCellReuseIdentifier: ExchangeRateCell.id)
         return tableView
     }()
 
@@ -54,7 +54,7 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: RatesCell.id) as? RatesCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateCell.id) as? ExchangeRateCell else {
             return UITableViewCell()
         }
         return cell

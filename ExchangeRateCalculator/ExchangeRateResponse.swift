@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CurrentRateResponse: Codable {
+struct ExchangeRateResponse: Codable {
     let baseCode: String
     let rates: [String: Double]
 

@@ -7,9 +7,9 @@
 
 import UIKit
 
-class RatesCell: UITableViewCell {
+class ExchangeRateCell: UITableViewCell {
     
-    static let id = "RatesCell"
+    static let id = "ExchangeRateCell"
     
     private lazy var countryLabel: UILabel = {
         let label = UILabel()

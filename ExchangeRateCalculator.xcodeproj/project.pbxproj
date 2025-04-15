@@ -12,26 +12,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		665575742DAE2221008F4A35 /* CurrentRateCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CurrentRateCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		665575742DAE2221008F4A35 /* ExchangeRateCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExchangeRateCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		665575892DAE2223008F4A35 /* Exceptions for "CurrentRateCalculator" folder in "CurrentRateCalculator" target */ = {
+		665575892DAE2223008F4A35 /* Exceptions for "ExchangeRateCalculator" folder in "ExchangeRateCalculator" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 665575732DAE2221008F4A35 /* CurrentRateCalculator */;
+			target = 665575732DAE2221008F4A35 /* ExchangeRateCalculator */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		665575762DAE2221008F4A35 /* CurrentRateCalculator */ = {
+		665575762DAE2221008F4A35 /* ExchangeRateCalculator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				665575892DAE2223008F4A35 /* Exceptions for "CurrentRateCalculator" folder in "CurrentRateCalculator" target */,
+				665575892DAE2223008F4A35 /* Exceptions for "ExchangeRateCalculator" folder in "ExchangeRateCalculator" target */,
 			);
-			path = CurrentRateCalculator;
+			path = ExchangeRateCalculator;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -52,7 +52,7 @@
 		6655756B2DAE2221008F4A35 = {
 			isa = PBXGroup;
 			children = (
-				665575762DAE2221008F4A35 /* CurrentRateCalculator */,
+				665575762DAE2221008F4A35 /* ExchangeRateCalculator */,
 				665575752DAE2221008F4A35 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -60,7 +60,7 @@
 		665575752DAE2221008F4A35 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				665575742DAE2221008F4A35 /* CurrentRateCalculator.app */,
+				665575742DAE2221008F4A35 /* ExchangeRateCalculator.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,9 +68,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		665575732DAE2221008F4A35 /* CurrentRateCalculator */ = {
+		665575732DAE2221008F4A35 /* ExchangeRateCalculator */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6655758A2DAE2223008F4A35 /* Build configuration list for PBXNativeTarget "CurrentRateCalculator" */;
+			buildConfigurationList = 6655758A2DAE2223008F4A35 /* Build configuration list for PBXNativeTarget "ExchangeRateCalculator" */;
 			buildPhases = (
 				665575702DAE2221008F4A35 /* Sources */,
 				665575712DAE2221008F4A35 /* Frameworks */,
@@ -81,15 +81,15 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				665575762DAE2221008F4A35 /* CurrentRateCalculator */,
+				665575762DAE2221008F4A35 /* ExchangeRateCalculator */,
 			);
-			name = CurrentRateCalculator;
+			name = ExchangeRateCalculator;
 			packageProductDependencies = (
 				665575902DAE226F008F4A35 /* Alamofire */,
 				665575932DAE2281008F4A35 /* SnapKit */,
 			);
 			productName = CurrentRateCalculator;
-			productReference = 665575742DAE2221008F4A35 /* CurrentRateCalculator.app */;
+			productReference = 665575742DAE2221008F4A35 /* ExchangeRateCalculator.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -107,7 +107,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 6655756F2DAE2221008F4A35 /* Build configuration list for PBXProject "CurrentRateCalculator" */;
+			buildConfigurationList = 6655756F2DAE2221008F4A35 /* Build configuration list for PBXProject "ExchangeRateCalculator" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -125,7 +125,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				665575732DAE2221008F4A35 /* CurrentRateCalculator */,
+				665575732DAE2221008F4A35 /* ExchangeRateCalculator */,
 			);
 		};
 /* End PBXProject section */
@@ -160,7 +160,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U54KVZDT39;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CurrentRateCalculator/Info.plist;
+				INFOPLIST_FILE = ExchangeRateCalculator/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -170,7 +170,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.eightroutes.CurrentRateCalculator;
+				PRODUCT_BUNDLE_IDENTIFIER = com.eightroutes.ExchangeRateCalculator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -191,7 +191,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U54KVZDT39;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CurrentRateCalculator/Info.plist;
+				INFOPLIST_FILE = ExchangeRateCalculator/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -201,7 +201,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.eightroutes.CurrentRateCalculator;
+				PRODUCT_BUNDLE_IDENTIFIER = com.eightroutes.ExchangeRateCalculator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -337,7 +337,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6655756F2DAE2221008F4A35 /* Build configuration list for PBXProject "CurrentRateCalculator" */ = {
+		6655756F2DAE2221008F4A35 /* Build configuration list for PBXProject "ExchangeRateCalculator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6655758D2DAE2223008F4A35 /* Debug */,
@@ -346,7 +346,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6655758A2DAE2223008F4A35 /* Build configuration list for PBXNativeTarget "CurrentRateCalculator" */ = {
+		6655758A2DAE2223008F4A35 /* Build configuration list for PBXNativeTarget "ExchangeRateCalculator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6655758B2DAE2223008F4A35 /* Debug */,

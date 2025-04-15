@@ -9,6 +9,8 @@ import UIKit
 
 class ExchangeRateCell: UITableViewCell {
     
+    var rateItem = [RateItem]()
+    
     static let id = "ExchangeRateCell"
     
     private lazy var countryLabel: UILabel = {
@@ -58,7 +60,12 @@ class ExchangeRateCell: UITableViewCell {
         }
     }
     
-    private func configureCell() {
-        
+    func configureCell(rateItem: RateItem) {
+        countryLabel.text = rateItem.currencyCode
+        priceLabel.text = String(format: "%.4f", rateItem.value)
     }
+    
+
+    
+   
 }

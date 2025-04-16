@@ -144,6 +144,7 @@ final class CalculatorViewController: UIViewController {
         }
     }
     
+    // 해당 currencyCode에 맞는 환율 정보 새로 업데이트
     private func fetchNewExchangeRate(text: String? = nil) {
         let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
         
@@ -176,6 +177,7 @@ final class CalculatorViewController: UIViewController {
 }
 
 extension Double {
+    // 소수점 자릿수 설정
     func toDigits(_ digit: Int) -> String {
         return String(format: "%.\(digit)f", self)
     }

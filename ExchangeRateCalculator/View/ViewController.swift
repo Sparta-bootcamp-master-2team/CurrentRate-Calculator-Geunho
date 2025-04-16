@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Alamofire
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
     
     var rateItems = [RateItem]()
         

@@ -1,1 +1,1 @@
-# CurrentRate-Calculator-Geunho
+# Exchange-Rate-Calculator-Geunho

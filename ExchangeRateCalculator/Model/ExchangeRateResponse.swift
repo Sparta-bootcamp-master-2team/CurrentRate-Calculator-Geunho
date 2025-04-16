@@ -14,7 +14,7 @@ struct ExchangeRateResponse: Codable {
 // 각 Cell에 들어갈 환율 정보
 struct RateItem {
     let currencyCode: String
-    let value: Double
+    var value: Double
     var countryName: String {
         RateItem.countryMap[currencyCode] ?? "Unknown"
     }

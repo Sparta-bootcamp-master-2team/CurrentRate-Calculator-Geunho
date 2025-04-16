@@ -128,7 +128,7 @@ extension ViewController: UITableViewDataSource {
 // MARK: - UISearchBar
 extension ViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        guard let text = searchBar.text?.uppercased() else { return }
+        guard let text = searchBar.text else { return }
         if searchBar.text == "" {
             fetchExchangeRateData()
         } else {

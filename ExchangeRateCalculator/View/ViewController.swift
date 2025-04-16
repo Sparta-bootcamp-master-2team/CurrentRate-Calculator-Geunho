@@ -13,6 +13,8 @@ class ViewController: UIViewController {
     
     var rateItems = [RateItem]()
     
+    private let calculatorView = CalculatorViewController()
+    
     private lazy var searchBar: UISearchBar = {
         let bar = UISearchBar()
         bar.placeholder = "통화 검색"
@@ -113,6 +115,11 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.navigationController?.pushViewController(calculatorView, animated: true)
+        calculatorView.configure(rateItem: rateItems[indexPath.row])
+    }
 }
 
 extension ViewController: UITableViewDataSource {
@@ -125,7 +132,7 @@ extension ViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateCell.id) as? ExchangeRateCell else {
             return UITableViewCell()
         }
-        cell.configureCell(rateItem: item)
+        cell.configure(rateItem: item)
         return cell
     }
 }

@@ -10,6 +10,8 @@ import SnapKit
 
 class CalculatorViewController: UIViewController {
     
+    let rateItem: RateItem
+    
     private lazy var labelStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -46,6 +48,7 @@ class CalculatorViewController: UIViewController {
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitle("환율 계산", for: .normal)
         button.layer.cornerRadius = 8
+        button.addTarget(self, action: #selector(convertButtonClicked), for: .touchUpInside)
         return button
     }()
     
@@ -63,6 +66,15 @@ class CalculatorViewController: UIViewController {
         
         setUI()
         setLayout()
+    }
+    
+    init(rateItem: RateItem) {
+        self.rateItem = rateItem
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func setUI() {
@@ -99,6 +111,20 @@ class CalculatorViewController: UIViewController {
         resultLabel.snp.makeConstraints { make in
             make.top.equalTo(convertButton.snp.bottom).offset(32)
             make.leading.trailing.equalToSuperview().inset(24)
+        }
+    }
+    
+    @objc func convertButtonClicked() {
+        if let amount = Double(amountTextField.text!) {
+            let computedAmount = Double(amount) * rateItem.value
+            let result = "$\(amount) -> \(computedAmount) \(rateItem.currencyCode)"
+            print(result)
+            resultLabel.text = result
+        } else {
+            let alert = UIAlertController(title: "오류", message: "올바른 숫자를 입력해주세요", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default))
+            self.present(alert, animated: true)
+            amountTextField.text = .none
         }
     }
     

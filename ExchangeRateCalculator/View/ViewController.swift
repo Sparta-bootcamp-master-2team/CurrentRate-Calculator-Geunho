@@ -12,9 +12,7 @@ import Alamofire
 class ViewController: UIViewController {
     
     var rateItems = [RateItem]()
-    
-    private let calculatorView = CalculatorViewController()
-    
+        
     private lazy var searchBar: UISearchBar = {
         let bar = UISearchBar()
         bar.placeholder = "통화 검색"
@@ -117,6 +115,7 @@ extension ViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let calculatorView = CalculatorViewController(rateItem: rateItems[indexPath.row])
         self.navigationController?.pushViewController(calculatorView, animated: true)
         calculatorView.configure(rateItem: rateItems[indexPath.row])
     }

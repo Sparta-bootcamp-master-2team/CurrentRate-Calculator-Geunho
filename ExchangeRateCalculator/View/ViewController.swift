@@ -120,7 +120,7 @@ extension ViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateCell.id) as? ExchangeRateCell else {
             return UITableViewCell()
         }
-        cell.configureCell(rateItem: rateItems[indexPath.row])
+        cell.configureCell(rateItem: item)
         return cell
     }
 }

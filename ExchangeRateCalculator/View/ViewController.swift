@@ -135,10 +135,4 @@ extension ViewController: UISearchBarDelegate {
             fetchExchangeRateData(text: text)
         }
     }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let text = searchBar.text else { return }
-        fetchExchangeRateData(text: text)
-        searchBar.resignFirstResponder()
-    }
 }

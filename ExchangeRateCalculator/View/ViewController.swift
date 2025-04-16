@@ -17,6 +17,8 @@ class ViewController: UIViewController {
         let bar = UISearchBar()
         bar.placeholder = "통화 검색"
         bar.searchBarStyle = .minimal
+        bar.delegate = self
+        bar.autocapitalizationType = .none
         return bar
     }()
     
@@ -28,7 +30,7 @@ class ViewController: UIViewController {
         tableView.register(ExchangeRateCell.self, forCellReuseIdentifier: ExchangeRateCell.id)
         return tableView
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -60,14 +62,12 @@ class ViewController: UIViewController {
     
     // 서버 데이터를 불러오는 메서드 (Alamofire)
     private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
-        
         AF.request(url).responseDecodable(of: T.self) { response in
             completion(response.result)
         }
-        
     }
     
-    private func fetchExchangeRateData() {
+    private func fetchExchangeRateData(text: String? = nil) {
         let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
         
         guard let url = urlComponents?.url else {
@@ -82,22 +82,28 @@ class ViewController: UIViewController {
             case .success(let exchangeResponse):
                 self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
                     .sorted { $0.currencyCode < $1.currencyCode }
+                    .filter {
+                        guard let text = text, !text.isEmpty else { return true }
+                        return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
+                        $0.countryName.localizedCaseInsensitiveContains(text)
+                    }
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
                 
             case .failure(let error):
                 print("데이터 로드 실패: \(error)")
-                    
+                
                 let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "확인", style: .default))
                 self.present(alert, animated: true)
             }
         }
     }
-
 }
 
+
+// MARK: - UITableView
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
@@ -116,5 +122,23 @@ extension ViewController: UITableViewDataSource {
         }
         cell.configureCell(rateItem: rateItems[indexPath.row])
         return cell
+    }
+}
+
+// MARK: - UISearchBar
+extension ViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        guard let text = searchBar.text?.uppercased() else { return }
+        if searchBar.text == "" {
+            fetchExchangeRateData()
+        } else {
+            fetchExchangeRateData(text: text)
+        }
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let text = searchBar.text else { return }
+        fetchExchangeRateData(text: text)
+        searchBar.resignFirstResponder()
     }
 }

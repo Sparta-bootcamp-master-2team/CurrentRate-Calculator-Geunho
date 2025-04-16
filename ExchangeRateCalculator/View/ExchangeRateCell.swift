@@ -13,7 +13,6 @@ final class ExchangeRateCell: UITableViewCell {
     
     private lazy var currencyLabel: UILabel = {
         let label = UILabel()
-        label.text = "KRW"
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .label
         return label
@@ -21,7 +20,6 @@ final class ExchangeRateCell: UITableViewCell {
     
     private lazy var countryLabel: UILabel = {
         let label = UILabel()
-        label.text = "대한민국"
         label.font = .systemFont(ofSize: 14)
         label.textColor = .secondaryLabel
         return label
@@ -36,7 +34,6 @@ final class ExchangeRateCell: UITableViewCell {
     
     private lazy var rateLabel: UILabel = {
         let label = UILabel()
-        label.text = "1400"
         label.font = .systemFont(ofSize: 16)
         label.textColor = .label
         label.textAlignment = .right

@@ -11,7 +11,7 @@ import SnapKit
 class CalculatorViewController: UIViewController {
     
     private lazy var labelStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [currencyLabel, countryLabel])
+        let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 4
         stackView.alignment = .center
@@ -20,14 +20,12 @@ class CalculatorViewController: UIViewController {
     
     private lazy var currencyLabel: UILabel = {
         let label = UILabel()
-        label.text = "KRW"
         label.font = .systemFont(ofSize: 24, weight: .bold)
         return label
     }()
     
     private lazy var countryLabel: UILabel = {
         let label = UILabel()
-        label.text = "대한민국"
         label.font = .systemFont(ofSize: 16)
         label.textColor = .secondaryLabel
         return label
@@ -73,6 +71,10 @@ class CalculatorViewController: UIViewController {
         [labelStackView, amountTextField, convertButton, resultLabel].forEach {
             view.addSubview($0)
         }
+        
+        [currencyLabel, countryLabel].forEach {
+            labelStackView.addArrangedSubview($0)
+        }
     }
     
     private func setLayout() {
@@ -98,5 +100,12 @@ class CalculatorViewController: UIViewController {
             make.top.equalTo(convertButton.snp.bottom).offset(32)
             make.leading.trailing.equalToSuperview().inset(24)
         }
+    }
+    
+    // Caculator View 정보 설정
+    func configure(rateItem: RateItem) {
+        currencyLabel.text = rateItem.currencyCode
+        countryLabel.text = rateItem.countryName
+        print(rateItem.currencyCode, rateItem.countryName)
     }
 }

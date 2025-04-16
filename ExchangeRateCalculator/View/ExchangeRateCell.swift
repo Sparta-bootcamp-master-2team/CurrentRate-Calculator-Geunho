@@ -44,9 +44,7 @@ class ExchangeRateCell: UITableViewCell {
         label.textAlignment = .right
         return label
     }()
-    
-    
-    
+        
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -79,17 +77,11 @@ class ExchangeRateCell: UITableViewCell {
             make.leading.greaterThanOrEqualTo(labelStackView.snp.trailing).offset(16)
             make.width.equalTo(120)
         }
-        
-        
     }
     
     func configureCell(rateItem: RateItem) {
         currencyLabel.text = rateItem.currencyCode
         rateLabel.text = String(format: "%.4f", rateItem.value)
-        countryLabel.text = Countries().country[rateItem.currencyCode]
+        countryLabel.text = rateItem.countryName
     }
-    
-
-    
-   
 }

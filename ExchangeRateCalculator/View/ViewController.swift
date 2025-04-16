@@ -81,27 +81,29 @@ final class ViewController: UIViewController {
             
             switch result {
             case .success(let exchangeResponse):
-                // RateItem 초기화
-                self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
-                    .sorted { $0.currencyCode < $1.currencyCode }
-                    .filter {
-                        // 검색 시 필터링
-                        guard let text = text, !text.isEmpty else { return true }
-                        // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
-                        return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
-                        $0.countryName.localizedCaseInsensitiveContains(text)
-                    }
                 DispatchQueue.main.async {
+                // RateItem 초기화
+                    self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
+                        .sorted { $0.currencyCode < $1.currencyCode }
+                        .filter {
+                            // 검색 시 필터링
+                            guard let text = text, !text.isEmpty else { return true }
+                            // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
+                            return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
+                            $0.countryName.localizedCaseInsensitiveContains(text)
+                        }
                     self.tableView.reloadData()
                 }
                 
             case .failure(let error):
                 print("데이터 로드 실패: \(error)")
                 
-                // Alert 창
-                let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
-                self.present(alert, animated: true)
+                DispatchQueue.main.async {
+                    // Alert 창
+                    let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "확인", style: .default))
+                    self.present(alert, animated: true)
+                }
             }
         }
     }

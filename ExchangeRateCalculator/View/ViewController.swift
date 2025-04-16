@@ -60,13 +60,14 @@ class ViewController: UIViewController {
         }
     }
     
-    // 서버 데이터를 불러오는 메서드 (Alamofire)
+    // 서버 데이터 불러오기 (Alamofire)
     private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
         AF.request(url).responseDecodable(of: T.self) { response in
             completion(response.result)
         }
     }
     
+    // 환율 정보 불러오기
     private func fetchExchangeRateData(text: String? = nil) {
         let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
         
@@ -80,10 +81,13 @@ class ViewController: UIViewController {
             
             switch result {
             case .success(let exchangeResponse):
+                // RateItem 초기화
                 self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
                     .sorted { $0.currencyCode < $1.currencyCode }
                     .filter {
+                        // 검색 시 필터링
                         guard let text = text, !text.isEmpty else { return true }
+                        // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
                         return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
                         $0.countryName.localizedCaseInsensitiveContains(text)
                     }
@@ -94,6 +98,7 @@ class ViewController: UIViewController {
             case .failure(let error):
                 print("데이터 로드 실패: \(error)")
                 
+                // Alert 창
                 let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "확인", style: .default))
                 self.present(alert, animated: true)

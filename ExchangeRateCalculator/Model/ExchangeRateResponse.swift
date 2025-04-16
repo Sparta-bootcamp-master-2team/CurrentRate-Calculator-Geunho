@@ -9,15 +9,17 @@ import Foundation
 
 struct ExchangeRateResponse: Codable {
     let rates: [String: Double]
-    
 }
 
+// 각 Cell에 들어갈 환율 정보
 struct RateItem {
     let currencyCode: String
     let value: Double
     var countryName: String {
         RateItem.countryMap[currencyCode] ?? "Unknown"
     }
+    
+    // 통화코드 : 국가명
     static let countryMap = ["USD": "미국",
                                 "AED": "아랍에미리트",
                                 "AFN": "아프가니스탄",

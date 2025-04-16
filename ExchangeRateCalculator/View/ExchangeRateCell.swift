@@ -79,6 +79,7 @@ class ExchangeRateCell: UITableViewCell {
         }
     }
     
+    // Cell 정보 설정
     func configureCell(rateItem: RateItem) {
         currencyLabel.text = rateItem.currencyCode
         rateLabel.text = String(format: "%.4f", rateItem.value)

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ExchangeRateCell: UITableViewCell {
+final class ExchangeRateCell: UITableViewCell {
         
     static let id = "ExchangeRateCell"
     

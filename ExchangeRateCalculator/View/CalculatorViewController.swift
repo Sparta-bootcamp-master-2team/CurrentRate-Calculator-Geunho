@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Alamofire
 
-class CalculatorViewController: UIViewController {
+final class CalculatorViewController: UIViewController {
     
     var rateItem: RateItem
     

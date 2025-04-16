@@ -7,10 +7,11 @@
 
 import UIKit
 import SnapKit
+import Alamofire
 
 class CalculatorViewController: UIViewController {
     
-    let rateItem: RateItem
+    var rateItem: RateItem
     
     private lazy var labelStackView: UIStackView = {
         let stackView = UIStackView()
@@ -115,6 +116,7 @@ class CalculatorViewController: UIViewController {
     }
     
     @objc func convertButtonClicked() {
+        fetchNewExchangeRate()
         if let amount = Double(amountTextField.text!) {
             let computedAmount = Double(amount) * rateItem.value
             let result = "$\(amount.toDigits(2)) -> \(computedAmount.toDigits(2)) \(rateItem.currencyCode)"
@@ -133,6 +135,43 @@ class CalculatorViewController: UIViewController {
         currencyLabel.text = rateItem.currencyCode
         countryLabel.text = rateItem.countryName
         print(rateItem.currencyCode, rateItem.countryName)
+    }
+    
+    // 서버 데이터 불러오기 (Alamofire)
+    private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
+        AF.request(url).responseDecodable(of: T.self) { response in
+            completion(response.result)
+        }
+    }
+    
+    private func fetchNewExchangeRate(text: String? = nil) {
+        let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
+        
+        guard let url = urlComponents?.url else {
+            print("잘못된 URL")
+            return
+        }
+        
+        fetchData(url: url) { [weak self] (result: Result<ExchangeRateResponse, AFError>) in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let exchangeResponse):
+                guard let newValue  = exchangeResponse.rates[self.rateItem.currencyCode] else {
+                    return
+                }
+                self.rateItem.value = newValue
+                print(self.rateItem.value, newValue)
+                
+            case .failure(let error):
+                print("데이터 로드 실패: \(error)")
+                
+                // Alert 창
+                let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self.present(alert, animated: true)
+            }
+        }
     }
 }
 

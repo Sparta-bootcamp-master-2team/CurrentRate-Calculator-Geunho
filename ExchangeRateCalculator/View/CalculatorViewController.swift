@@ -117,7 +117,7 @@ class CalculatorViewController: UIViewController {
     @objc func convertButtonClicked() {
         if let amount = Double(amountTextField.text!) {
             let computedAmount = Double(amount) * rateItem.value
-            let result = "$\(amount) -> \(computedAmount) \(rateItem.currencyCode)"
+            let result = "$\(amount.toDigits(2)) -> \(computedAmount.toDigits(2)) \(rateItem.currencyCode)"
             print(result)
             resultLabel.text = result
         } else {
@@ -133,5 +133,11 @@ class CalculatorViewController: UIViewController {
         currencyLabel.text = rateItem.currencyCode
         countryLabel.text = rateItem.countryName
         print(rateItem.currencyCode, rateItem.countryName)
+    }
+}
+
+extension Double {
+    func toDigits(_ digit: Int) -> String {
+        return String(format: "%.\(digit)f", self)
     }
 }

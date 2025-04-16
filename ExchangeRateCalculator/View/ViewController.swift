@@ -113,6 +113,10 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.navigationController?.pushViewController(CalculatorViewController(), animated: true)
+    }
 }
 
 extension ViewController: UITableViewDataSource {

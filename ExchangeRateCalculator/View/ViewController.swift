@@ -32,6 +32,15 @@ final class ViewController: UIViewController {
         return tableView
     }()
     
+    private lazy var emptyTextLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16)
+        label.text = "검색 결과 없음"
+        label.textColor = .secondaryLabel
+        label.isHidden = true
+        return label
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -43,7 +52,7 @@ final class ViewController: UIViewController {
     private func setUI() {
         view.backgroundColor = .systemBackground
         
-        [searchBar, tableView].forEach {
+        [searchBar, tableView, emptyTextLabel].forEach {
             view.addSubview($0)
         }
     }
@@ -58,6 +67,11 @@ final class ViewController: UIViewController {
         tableView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
             make.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        emptyTextLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalTo(tableView)
         }
     }
     
@@ -139,12 +153,14 @@ extension ViewController: UISearchBarDelegate {
         guard let text = searchBar.text else { return }
         filterLoadedData(text: text)
         
+        emptyTextLabel.isHidden = !rateItems.isEmpty
+
         self.tableView.reloadData()
     }
     
-    private func filterLoadedData(text: String? = nil) {
-        
-        guard let text = text, !text.isEmpty else {
+    private func filterLoadedData(text: String) {
+
+        guard !text.isEmpty else {
             self.rateItems = tempRateItems
             return
         }

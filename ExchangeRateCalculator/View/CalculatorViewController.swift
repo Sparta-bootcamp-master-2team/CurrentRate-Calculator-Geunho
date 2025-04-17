@@ -10,9 +10,10 @@ import SnapKit
 import Alamofire
 
 final class CalculatorViewController: UIViewController {
-    
+
     var rateItem: RateItem
     
+    // MARK: - UI Components
     private lazy var labelStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -70,6 +71,7 @@ final class CalculatorViewController: UIViewController {
         setupTapGesture()
     }
     
+    // MARK: - Initializers
     init(rateItem: RateItem) {
         self.rateItem = rateItem
         super.init(nibName: nil, bundle: nil)
@@ -79,6 +81,7 @@ final class CalculatorViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI & Layout
     private func setUI() {
         view.backgroundColor = .systemBackground
         
@@ -116,6 +119,12 @@ final class CalculatorViewController: UIViewController {
         }
     }
     
+    // MARK: - Action
+    /// 키보드 해제
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
     @objc func convertButtonClicked() {
         fetchNewExchangeRate()
         if let amount = Double(amountTextField.text!) {
@@ -131,21 +140,12 @@ final class CalculatorViewController: UIViewController {
         }
     }
     
+    // MARK: - Private Methods
+    /// TapGesture 추가, tapGesture.cancelsTouchesInView = false로 뷰 내 터치 정상적으로 동작
     private func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
-    }
-    
-    @objc private func dismissKeyboard() {
-        view.endEditing(true)
-    }
-    
-    // Caculator View 정보 설정
-    func configure(rateItem: RateItem) {
-        currencyLabel.text = rateItem.currencyCode
-        countryLabel.text = rateItem.countryName
-        print(rateItem.currencyCode, rateItem.countryName)
     }
     
     // 서버 데이터 불러오기 (Alamofire)
@@ -184,6 +184,14 @@ final class CalculatorViewController: UIViewController {
                 self.present(alert, animated: true)
             }
         }
+    }
+    
+    // MARK: - Internal Methods
+    // Caculator View 정보 설정
+    func configure(rateItem: RateItem) {
+        currencyLabel.text = rateItem.currencyCode
+        countryLabel.text = rateItem.countryName
+        print(rateItem.currencyCode, rateItem.countryName)
     }
 }
 

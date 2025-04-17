@@ -10,10 +10,11 @@ import SnapKit
 import Alamofire
 
 final class ViewController: UIViewController {
-    
+     
     var rateItems = [RateItem]()
     var tempRateItems = [RateItem]()
-        
+    
+    // MARK: - UI Components
     private lazy var searchBar: UISearchBar = {
         let bar = UISearchBar()
         bar.placeholder = "통화 검색"
@@ -50,6 +51,7 @@ final class ViewController: UIViewController {
         setupTapGesture()
     }
     
+    // MARK: - UI & Layout
     private func setUI() {
         view.backgroundColor = .systemBackground
         
@@ -77,25 +79,28 @@ final class ViewController: UIViewController {
     }
     
 
-    
+    // MARK: - Action
+    /// 키보드 해제
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+
+    // MARK: - Private Methods
+    /// TapGesture 추가, tapGesture.cancelsTouchesInView = false로 뷰 내 터치 정상적으로 동작
     private func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
     }
     
-    @objc private func dismissKeyboard() {
-        view.endEditing(true)
-    }
-    
-    // 서버 데이터 불러오기 (Alamofire)
+    /// 서버 데이터 불러오기 (Alamofire)
     private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
         AF.request(url).responseDecodable(of: T.self) { response in
             completion(response.result)
         }
     }
     
-    // 환율 정보 불러오기
+    /// 환율 정보 불러오기
     private func fetchExchangeRateData(text: String? = nil) {
         let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
         

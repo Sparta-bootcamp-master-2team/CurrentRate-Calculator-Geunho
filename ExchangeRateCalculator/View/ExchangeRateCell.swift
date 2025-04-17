@@ -11,6 +11,7 @@ final class ExchangeRateCell: UITableViewCell {
         
     static let id = "ExchangeRateCell"
     
+    // MARK: - UI Components
     private lazy var currencyLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -40,6 +41,7 @@ final class ExchangeRateCell: UITableViewCell {
         return label
     }()
         
+    // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -51,6 +53,7 @@ final class ExchangeRateCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI & Layout
     private func setUI() {
         contentView.backgroundColor = .systemBackground
         
@@ -74,7 +77,8 @@ final class ExchangeRateCell: UITableViewCell {
         }
     }
     
-    // Cell 정보 설정
+    // MARK: - Internal Methods
+    /// Cell 정보 설정
     func configure(rateItem: RateItem) {
         currencyLabel.text = rateItem.currencyCode
         rateLabel.text = rateItem.value.toDigits(4)

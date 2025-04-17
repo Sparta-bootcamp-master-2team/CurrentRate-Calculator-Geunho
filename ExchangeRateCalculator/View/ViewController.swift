@@ -47,6 +47,7 @@ final class ViewController: UIViewController {
         setUI()
         setLayout()
         fetchExchangeRateData()
+        setupTapGesture()
     }
     
     private func setUI() {
@@ -73,6 +74,18 @@ final class ViewController: UIViewController {
             make.centerX.equalToSuperview()
             make.centerY.equalTo(tableView)
         }
+    }
+    
+
+    
+    private func setupTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     // 서버 데이터 불러오기 (Alamofire)
@@ -170,5 +183,13 @@ extension ViewController: UISearchBarDelegate {
             return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
             $0.countryName.localizedCaseInsensitiveContains(text)
         }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        dismissKeyboard()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        dismissKeyboard()
     }
 }

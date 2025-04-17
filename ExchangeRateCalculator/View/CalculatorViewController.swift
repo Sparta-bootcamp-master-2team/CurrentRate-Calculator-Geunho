@@ -67,6 +67,7 @@ final class CalculatorViewController: UIViewController {
         
         setUI()
         setLayout()
+        setupTapGesture()
     }
     
     init(rateItem: RateItem) {
@@ -128,6 +129,16 @@ final class CalculatorViewController: UIViewController {
             self.present(alert, animated: true)
             amountTextField.text = .none
         }
+    }
+    
+    private func setupTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     // Caculator View 정보 설정

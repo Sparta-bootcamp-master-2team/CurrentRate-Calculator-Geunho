@@ -126,18 +126,19 @@ final class CalculatorViewController: UIViewController {
     }
     
     @objc func convertButtonClicked() {
-        fetchNewExchangeRate()
-        if let amount = Double(amountTextField.text!) {
-            let computedAmount = Double(amount) * rateItem.value
-            let result = "$\(amount.toDigits(2)) -> \(computedAmount.toDigits(2)) \(rateItem.currencyCode)"
-            print(result)
-            resultLabel.text = result
-        } else {
-            let alert = UIAlertController(title: "오류", message: "올바른 숫자를 입력해주세요", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "확인", style: .default))
-            self.present(alert, animated: true)
-            amountTextField.text = .none
+        
+        guard let amount = Double(amountTextField.text ?? "") else {
+            showInvalidInputAlert()
+            return
         }
+        
+        // fetchNewExchangeRate에서 최신 환율 값을 받아온 후 계산 실행
+        fetchNewExchangeRate(completion: { [weak self] in
+            guard let self = self else { return }
+            let computedAmount = amount * self.rateItem.value
+            let result = ("$\(amount.toDigits(2)) → \(computedAmount.toDigits(2)) \(self.rateItem.currencyCode)")
+            self.resultLabel.text = result
+        })
     }
     
     // MARK: - Private Methods
@@ -148,15 +149,15 @@ final class CalculatorViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
-    // 서버 데이터 불러오기 (Alamofire)
+    /// 서버 데이터 불러오기 (Alamofire)
     private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
         AF.request(url).responseDecodable(of: T.self) { response in
             completion(response.result)
         }
     }
     
-    // 해당 currencyCode에 맞는 환율 정보 새로 업데이트
-    private func fetchNewExchangeRate(text: String? = nil) {
+    /// 해당 currencyCode에 맞는 환율 정보 새로 업데이트
+    private func fetchNewExchangeRate(completion: @escaping () -> Void) {
         let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
         
         guard let url = urlComponents?.url else {
@@ -169,21 +170,31 @@ final class CalculatorViewController: UIViewController {
             
             switch result {
             case .success(let exchangeResponse):
-                guard let newValue  = exchangeResponse.rates[self.rateItem.currencyCode] else {
-                    return
+                if let newValue  = exchangeResponse.rates[self.rateItem.currencyCode] {
+                    self.rateItem.value = newValue
+                    print("newValue: \(newValue)")
+                    completion()
+                } else {
+                    showNetworkErrorAlert()
                 }
-                self.rateItem.value = newValue
-                print(self.rateItem.value, newValue)
-                
             case .failure(let error):
                 print("데이터 로드 실패: \(error)")
                 
-                // Alert 창
-                let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
-                self.present(alert, animated: true)
+                showNetworkErrorAlert()
             }
         }
+    }
+    
+    private func showInvalidInputAlert() {
+        let alert = UIAlertController(title: "오류", message: "올바른 숫자를 입력해주세요", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(alert, animated: true)
+    }
+    
+    private func showNetworkErrorAlert() {
+        let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(alert, animated: true)
     }
     
     // MARK: - Internal Methods

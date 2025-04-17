@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MainViewController.swift
 //  CurrentRateCalculator
 //
 //  Created by 정근호 on 4/15/25.
@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Alamofire
 
-final class ViewController: UIViewController {
+final class ExchangeRateViewController: UIViewController {
      
     var rateItems = [RateItem]()
     var tempRateItems = [RateItem]()
@@ -138,7 +138,7 @@ final class ViewController: UIViewController {
 
 
 // MARK: - UITableView
-extension ViewController: UITableViewDelegate {
+extension ExchangeRateViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
@@ -150,7 +150,7 @@ extension ViewController: UITableViewDelegate {
     }
 }
 
-extension ViewController: UITableViewDataSource {
+extension ExchangeRateViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return rateItems.count
     }
@@ -166,7 +166,7 @@ extension ViewController: UITableViewDataSource {
 }
 
 // MARK: - UISearchBar
-extension ViewController: UISearchBarDelegate {
+extension ExchangeRateViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         guard let text = searchBar.text else { return }
         filterLoadedData(text: text)
@@ -176,6 +176,7 @@ extension ViewController: UISearchBarDelegate {
         self.tableView.reloadData()
     }
     
+    // viewmodel
     private func filterLoadedData(text: String) {
 
         guard !text.isEmpty else {
@@ -198,3 +199,8 @@ extension ViewController: UISearchBarDelegate {
         dismissKeyboard()
     }
 }
+
+// 뷰모델 역할
+// 바인딩 방법 종류(어떻게하는지)
+// Combine, RxSwift
+// @Observable

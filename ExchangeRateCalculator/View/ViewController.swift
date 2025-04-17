@@ -12,6 +12,7 @@ import Alamofire
 final class ViewController: UIViewController {
     
     var rateItems = [RateItem]()
+    var tempRateItems = [RateItem]()
         
     private lazy var searchBar: UISearchBar = {
         let bar = UISearchBar()
@@ -85,13 +86,7 @@ final class ViewController: UIViewController {
                 // RateItem 초기화
                     self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
                         .sorted { $0.currencyCode < $1.currencyCode }
-                        .filter {
-                            // 검색 시 필터링
-                            guard let text = text, !text.isEmpty else { return true }
-                            // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
-                            return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
-                            $0.countryName.localizedCaseInsensitiveContains(text)
-                        }
+                    self.tempRateItems = self.rateItems
                     self.tableView.reloadData()
                 }
                 
@@ -142,10 +137,22 @@ extension ViewController: UITableViewDataSource {
 extension ViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         guard let text = searchBar.text else { return }
-        if searchBar.text == "" {
-            fetchExchangeRateData()
-        } else {
-            fetchExchangeRateData(text: text)
+        filterLoadedData(text: text)
+        
+        self.tableView.reloadData()
+    }
+    
+    private func filterLoadedData(text: String? = nil) {
+        
+        guard let text = text, !text.isEmpty else {
+            self.rateItems = tempRateItems
+            return
+        }
+
+        self.rateItems = tempRateItems.filter {
+            // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
+            return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
+            $0.countryName.localizedCaseInsensitiveContains(text)
         }
     }
 }

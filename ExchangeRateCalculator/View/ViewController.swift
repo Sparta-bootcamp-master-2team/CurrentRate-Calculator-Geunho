@@ -10,9 +10,11 @@ import SnapKit
 import Alamofire
 
 final class ViewController: UIViewController {
-    
+     
     var rateItems = [RateItem]()
-        
+    var tempRateItems = [RateItem]()
+    
+    // MARK: - UI Components
     private lazy var searchBar: UISearchBar = {
         let bar = UISearchBar()
         bar.placeholder = "통화 검색"
@@ -31,18 +33,29 @@ final class ViewController: UIViewController {
         return tableView
     }()
     
+    private lazy var emptyTextLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16)
+        label.text = "검색 결과 없음"
+        label.textColor = .secondaryLabel
+        label.isHidden = true
+        return label
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setUI()
         setLayout()
         fetchExchangeRateData()
+        setupTapGesture()
     }
     
+    // MARK: - UI & Layout
     private func setUI() {
         view.backgroundColor = .systemBackground
         
-        [searchBar, tableView].forEach {
+        [searchBar, tableView, emptyTextLabel].forEach {
             view.addSubview($0)
         }
     }
@@ -58,16 +71,36 @@ final class ViewController: UIViewController {
             make.top.equalTo(searchBar.snp.bottom)
             make.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
+        
+        emptyTextLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalTo(tableView)
+        }
     }
     
-    // 서버 데이터 불러오기 (Alamofire)
+
+    // MARK: - Action
+    /// 키보드 해제
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+
+    // MARK: - Private Methods
+    /// TapGesture 추가, tapGesture.cancelsTouchesInView = false로 뷰 내 터치 정상적으로 동작
+    private func setupTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    /// 서버 데이터 불러오기 (Alamofire)
     private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
         AF.request(url).responseDecodable(of: T.self) { response in
             completion(response.result)
         }
     }
     
-    // 환율 정보 불러오기
+    /// 환율 정보 불러오기
     private func fetchExchangeRateData(text: String? = nil) {
         let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
         
@@ -81,27 +114,23 @@ final class ViewController: UIViewController {
             
             switch result {
             case .success(let exchangeResponse):
-                // RateItem 초기화
-                self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
-                    .sorted { $0.currencyCode < $1.currencyCode }
-                    .filter {
-                        // 검색 시 필터링
-                        guard let text = text, !text.isEmpty else { return true }
-                        // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
-                        return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
-                        $0.countryName.localizedCaseInsensitiveContains(text)
-                    }
                 DispatchQueue.main.async {
+                // RateItem 초기화
+                    self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
+                        .sorted { $0.currencyCode < $1.currencyCode }
+                    self.tempRateItems = self.rateItems
                     self.tableView.reloadData()
                 }
                 
             case .failure(let error):
                 print("데이터 로드 실패: \(error)")
                 
-                // Alert 창
-                let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
-                self.present(alert, animated: true)
+                DispatchQueue.main.async {
+                    // Alert 창
+                    let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "확인", style: .default))
+                    self.present(alert, animated: true)
+                }
             }
         }
     }
@@ -140,10 +169,32 @@ extension ViewController: UITableViewDataSource {
 extension ViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         guard let text = searchBar.text else { return }
-        if searchBar.text == "" {
-            fetchExchangeRateData()
-        } else {
-            fetchExchangeRateData(text: text)
+        filterLoadedData(text: text)
+        
+        emptyTextLabel.isHidden = !rateItems.isEmpty
+
+        self.tableView.reloadData()
+    }
+    
+    private func filterLoadedData(text: String) {
+
+        guard !text.isEmpty else {
+            self.rateItems = tempRateItems
+            return
         }
+
+        self.rateItems = tempRateItems.filter {
+            // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
+            return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
+            $0.countryName.localizedCaseInsensitiveContains(text)
+        }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        dismissKeyboard()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        dismissKeyboard()
     }
 }

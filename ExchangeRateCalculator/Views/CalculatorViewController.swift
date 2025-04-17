@@ -149,38 +149,26 @@ final class CalculatorViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
-    /// 서버 데이터 불러오기 (Alamofire)
-    private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
-        AF.request(url).responseDecodable(of: T.self) { response in
-            completion(response.result)
-        }
-    }
-    
     /// 해당 currencyCode에 맞는 환율 정보 새로 업데이트
     private func fetchNewExchangeRate(completion: @escaping () -> Void) {
-        let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
-        
-        guard let url = urlComponents?.url else {
-            print("잘못된 URL")
-            return
-        }
-        
-        fetchData(url: url) { [weak self] (result: Result<ExchangeRateResponse, AFError>) in
-            guard let self else { return }
+        NetworkManager.shared.fetchData { [weak self] (result: Result<ExchangeRateResponse, Error>) in
+            guard let self = self else { return }
             
-            switch result {
-            case .success(let exchangeResponse):
-                if let newValue  = exchangeResponse.rates[self.rateItem.currencyCode] {
-                    self.rateItem.value = newValue
-                    print("newValue: \(newValue)")
-                    completion()
-                } else {
-                    showNetworkErrorAlert()
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let exchangeResponse):
+                    if let newValue  = exchangeResponse.rates[self.rateItem.currencyCode] {
+                        self.rateItem.value = newValue
+                        print("newValue: \(newValue)")
+                        completion()
+                    } else {
+                        self.showNetworkErrorAlert()
+                    }
+                case .failure(let error):
+                    print("데이터 로드 실패: \(error)")
+                    
+                    self.showNetworkErrorAlert()
                 }
-            case .failure(let error):
-                print("데이터 로드 실패: \(error)")
-                
-                showNetworkErrorAlert()
             }
         }
     }

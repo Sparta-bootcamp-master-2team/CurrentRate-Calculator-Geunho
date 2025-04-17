@@ -93,46 +93,35 @@ final class ExchangeRateViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
-    /// 서버 데이터 불러오기 (Alamofire)
-    private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
-        AF.request(url).responseDecodable(of: T.self) { response in
-            completion(response.result)
-        }
-    }
-    
-    /// 환율 정보 불러오기
-    private func fetchExchangeRateData(text: String? = nil) {
-        let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
-        
-        guard let url = urlComponents?.url else {
-            print("잘못된 URL")
-            return
-        }
-        
-        fetchData(url: url) { [weak self] (result: Result<ExchangeRateResponse, AFError>) in
-            guard let self else { return }
+    func fetchExchangeRateData() {
+
+        NetworkManager.shared.fetchData { [weak self] (result: Result<ExchangeRateResponse, Error>) in
+            guard let self = self else { return }
             
-            switch result {
-            case .success(let exchangeResponse):
-                DispatchQueue.main.async {
-                // RateItem 초기화
-                    self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
-                        .sorted { $0.currencyCode < $1.currencyCode }
-                    self.tempRateItems = self.rateItems
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    let items = response.rates.map {
+                        RateItem(currencyCode: $0.key, value: $0.value)
+                    }.sorted { $0.currencyCode < $1.currencyCode }
+                    
+                    self.rateItems = items
+                    self.tempRateItems = items
+                    self.emptyTextLabel.isHidden = !items.isEmpty
                     self.tableView.reloadData()
-                }
-                
-            case .failure(let error):
-                print("데이터 로드 실패: \(error)")
-                
-                DispatchQueue.main.async {
-                    // Alert 창
-                    let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "확인", style: .default))
-                    self.present(alert, animated: true)
+                    
+                case .failure(let error):
+                    print("데이터 로드 실패: \(error)")
+                    self.showNetworkErrorAlert()
                 }
             }
         }
+    }
+    
+    private func showNetworkErrorAlert() {
+        let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(alert, animated: true)
     }
 }
 

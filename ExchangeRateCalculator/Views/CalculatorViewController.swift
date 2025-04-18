@@ -10,7 +10,7 @@ import SnapKit
 import Alamofire
 
 final class CalculatorViewController: UIViewController {
-
+    
     var rateItem: RateItem
     
     // MARK: - UI Components
@@ -84,6 +84,9 @@ final class CalculatorViewController: UIViewController {
     // MARK: - UI & Layout
     private func setUI() {
         view.backgroundColor = .systemBackground
+        title = "환율 계산기"
+        
+        self.navigationController?.navigationBar.prefersLargeTitles = true
         
         [labelStackView, amountTextField, convertButton, resultLabel].forEach {
             view.addSubview($0)
@@ -194,9 +197,3 @@ final class CalculatorViewController: UIViewController {
     }
 }
 
-extension Double {
-    // 소수점 자릿수 설정
-    func toDigits(_ digit: Int) -> String {
-        return String(format: "%.\(digit)f", self)
-    }
-}

@@ -54,6 +54,9 @@ final class ExchangeRateViewController: UIViewController {
     // MARK: - UI & Layout
     private func setUI() {
         view.backgroundColor = .systemBackground
+        title = "환율 정보"
+        
+        self.navigationController?.navigationBar.prefersLargeTitles = true
         
         [searchBar, tableView, emptyTextLabel].forEach {
             view.addSubview($0)
@@ -188,8 +191,3 @@ extension ExchangeRateViewController: UISearchBarDelegate {
         dismissKeyboard()
     }
 }
-
-// 뷰모델 역할
-// 바인딩 방법 종류(어떻게하는지)
-// Combine, RxSwift
-// @Observable

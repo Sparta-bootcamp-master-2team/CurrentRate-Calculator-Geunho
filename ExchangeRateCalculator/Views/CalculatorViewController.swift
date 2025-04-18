@@ -7,11 +7,12 @@
 
 import UIKit
 import SnapKit
-import Alamofire
+import Combine
 
 final class CalculatorViewController: UIViewController {
     
-    var rateItem: RateItem
+    let viewModel: CalculatorViewModel
+    var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI Components
     private lazy var labelStackView: UIStackView = {
@@ -69,11 +70,13 @@ final class CalculatorViewController: UIViewController {
         setUI()
         setLayout()
         setupTapGesture()
+        bindViewModel()
+        viewModel.configure()
     }
     
     // MARK: - Initializers
-    init(rateItem: RateItem) {
-        self.rateItem = rateItem
+    init(viewModel: CalculatorViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -135,45 +138,34 @@ final class CalculatorViewController: UIViewController {
             return
         }
         
-        // fetchNewExchangeRate에서 최신 환율 값을 받아온 후 계산 실행
-        fetchNewExchangeRate(completion: { [weak self] in
-            guard let self = self else { return }
-            let computedAmount = amount * self.rateItem.value
-            let result = ("$\(amount.toDigits(2)) → \(computedAmount.toDigits(2)) \(self.rateItem.currencyCode)")
-            self.resultLabel.text = result
-        })
+        viewModel.setNewExchangeRate(amount)
     }
     
     // MARK: - Private Methods
+    private func bindViewModel() {
+        
+        // Caculator View 정보 설정
+        viewModel.$resultText
+            .receive(on: RunLoop.main)
+            .assign(to: \.text, on: resultLabel)
+            .store(in: &cancellables)
+        
+        viewModel.$currencyLabelText
+            .receive(on: RunLoop.main)
+            .assign(to: \.text, on: currencyLabel)
+            .store(in: &cancellables)
+        
+        viewModel.$countryLabelText
+            .receive(on: RunLoop.main)
+            .assign(to: \.text, on: countryLabel)
+            .store(in: &cancellables)
+    }
+    
     /// TapGesture 추가, tapGesture.cancelsTouchesInView = false로 뷰 내 터치 정상적으로 동작
     private func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
-    }
-    
-    /// 해당 currencyCode에 맞는 환율 정보 새로 업데이트
-    private func fetchNewExchangeRate(completion: @escaping () -> Void) {
-        NetworkManager.shared.fetchData { [weak self] (result: Result<ExchangeRateResponse, Error>) in
-            guard let self = self else { return }
-            
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let exchangeResponse):
-                    if let newValue  = exchangeResponse.rates[self.rateItem.currencyCode] {
-                        self.rateItem.value = newValue
-                        print("newValue: \(newValue)")
-                        completion()
-                    } else {
-                        self.showNetworkErrorAlert()
-                    }
-                case .failure(let error):
-                    print("데이터 로드 실패: \(error)")
-                    
-                    self.showNetworkErrorAlert()
-                }
-            }
-        }
     }
     
     private func showInvalidInputAlert() {
@@ -186,14 +178,6 @@ final class CalculatorViewController: UIViewController {
         let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         self.present(alert, animated: true)
-    }
-    
-    // MARK: - Internal Methods
-    // Caculator View 정보 설정
-    func configure(rateItem: RateItem) {
-        currencyLabel.text = rateItem.currencyCode
-        countryLabel.text = rateItem.countryName
-        print(rateItem.currencyCode, rateItem.countryName)
     }
 }
 

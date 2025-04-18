@@ -7,17 +7,6 @@
 
 import Foundation
 
-enum ExchangeRateState {
-    case idle
-    case loaded([RateItem])
-    case error
-}
-
-enum ExchangeRateAction {
-    case fetch
-    case filter(String)
-}
-
 final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
     
     init() {

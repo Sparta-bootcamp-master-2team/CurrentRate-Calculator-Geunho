@@ -7,7 +7,6 @@
 
 import UIKit
 import SnapKit
-import Alamofire
 import Combine
 
 final class ExchangeRateViewController: UIViewController {
@@ -139,9 +138,12 @@ extension ExchangeRateViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let calculatorView = CalculatorViewController(rateItem: viewModel.rateItems[indexPath.row])
+        // CalculatorView, CalculatorViewModel 생성
+        let calculatorViewModel = CalculatorViewModel(rateItem: viewModel.rateItems[indexPath.row])
+        
+        let calculatorView = CalculatorViewController(viewModel: calculatorViewModel)
+        
         self.navigationController?.pushViewController(calculatorView, animated: true)
-        calculatorView.configure(rateItem: viewModel.rateItems[indexPath.row])
     }
 }
 

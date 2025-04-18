@@ -7,6 +7,17 @@
 
 import Foundation
 
+enum ExchangeRateState {
+    case idle
+    case loaded([RateItem])
+    case error
+}
+
+enum ExchangeRateAction {
+    case fetch
+    case filter(String)
+}
+
 protocol ViewModelProtocol {
     associatedtype Action
     associatedtype State

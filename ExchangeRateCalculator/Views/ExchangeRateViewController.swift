@@ -8,11 +8,12 @@
 import UIKit
 import SnapKit
 import Alamofire
+import Combine
 
 final class ExchangeRateViewController: UIViewController {
-     
-    var rateItems = [RateItem]()
-    var tempRateItems = [RateItem]()
+    
+    let viewModel = ExchangeRateViewModel()
+    var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI Components
     private lazy var searchBar: UISearchBar = {
@@ -47,14 +48,14 @@ final class ExchangeRateViewController: UIViewController {
         
         setUI()
         setLayout()
-        fetchExchangeRateData()
+        bindViewModel()
+        viewModel.setExchangeRate(.fetch)
         setupTapGesture()
     }
     
     // MARK: - UI & Layout
     private func setUI() {
         view.backgroundColor = .systemBackground
-        title = "환율 정보"
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         
@@ -89,36 +90,38 @@ final class ExchangeRateViewController: UIViewController {
     }
 
     // MARK: - Private Methods
+    private func bindViewModel() {
+        print(#function)
+        
+        viewModel.$titleText
+            .sink {
+                self.title = $0
+            }.store(in: &cancellables)
+        
+        // 상태에 따라 emptyTextLabel 표시, 에러 메시지 표시 등 동작
+        viewModel.$state
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                guard let self = self else { return }
+                
+                switch state {
+                case .idle:
+                    break
+                case .loaded(let items):
+                    self.emptyTextLabel.isHidden = !items.isEmpty
+                    self.tableView.reloadData()
+                case .error:
+                    self.showNetworkErrorAlert()
+                }
+            }.store(in: &cancellables)
+    }
+    
+    
     /// TapGesture 추가, tapGesture.cancelsTouchesInView = false로 뷰 내 터치 정상적으로 동작
     private func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
-    }
-    
-    func fetchExchangeRateData() {
-
-        NetworkManager.shared.fetchData { [weak self] (result: Result<ExchangeRateResponse, Error>) in
-            guard let self = self else { return }
-            
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let response):
-                    let items = response.rates.map {
-                        RateItem(currencyCode: $0.key, value: $0.value)
-                    }.sorted { $0.currencyCode < $1.currencyCode }
-                    
-                    self.rateItems = items
-                    self.tempRateItems = items
-                    self.emptyTextLabel.isHidden = !items.isEmpty
-                    self.tableView.reloadData()
-                    
-                case .failure(let error):
-                    print("데이터 로드 실패: \(error)")
-                    self.showNetworkErrorAlert()
-                }
-            }
-        }
     }
     
     private func showNetworkErrorAlert() {
@@ -136,19 +139,19 @@ extension ExchangeRateViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let calculatorView = CalculatorViewController(rateItem: rateItems[indexPath.row])
+        let calculatorView = CalculatorViewController(rateItem: viewModel.rateItems[indexPath.row])
         self.navigationController?.pushViewController(calculatorView, animated: true)
-        calculatorView.configure(rateItem: rateItems[indexPath.row])
+        calculatorView.configure(rateItem: viewModel.rateItems[indexPath.row])
     }
 }
 
 extension ExchangeRateViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return rateItems.count
+        return viewModel.rateItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let item = rateItems[indexPath.row]
+        let item = viewModel.rateItems[indexPath.row]
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateCell.id) as? ExchangeRateCell else {
             return UITableViewCell()
         }
@@ -161,26 +164,10 @@ extension ExchangeRateViewController: UITableViewDataSource {
 extension ExchangeRateViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         guard let text = searchBar.text else { return }
-        filterLoadedData(text: text)
         
-        emptyTextLabel.isHidden = !rateItems.isEmpty
-
+        viewModel.setExchangeRate(.filter(text))
+        
         self.tableView.reloadData()
-    }
-    
-    // viewmodel
-    private func filterLoadedData(text: String) {
-
-        guard !text.isEmpty else {
-            self.rateItems = tempRateItems
-            return
-        }
-
-        self.rateItems = tempRateItems.filter {
-            // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
-            return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
-            $0.countryName.localizedCaseInsensitiveContains(text)
-        }
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

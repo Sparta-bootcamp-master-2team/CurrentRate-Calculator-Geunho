@@ -97,7 +97,7 @@ final class ExchangeRateViewController: UIViewController {
                 self.title = $0
             }.store(in: &cancellables)
         
-        // 상태에 따라 emptyTextLabel 표시, 에러 메시지 표시 등 동작
+        // 상태에 따라 emptyTextLabel 표시, Alert 표시 등 동작
         viewModel.$state
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
@@ -110,7 +110,7 @@ final class ExchangeRateViewController: UIViewController {
                     self.emptyTextLabel.isHidden = !items.isEmpty
                     self.tableView.reloadData()
                 case .error:
-                    self.showNetworkErrorAlert()
+                    self.showAlert(alertTitle: "오류", message: "데이터를 불러올 수 없습니다", actionTitle: "확인")
                 }
             }.store(in: &cancellables)
     }
@@ -121,12 +121,6 @@ final class ExchangeRateViewController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
-    }
-    
-    private func showNetworkErrorAlert() {
-        let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "확인", style: .default))
-        self.present(alert, animated: true)
     }
 }
 

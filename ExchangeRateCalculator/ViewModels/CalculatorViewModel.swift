@@ -1,4 +1,3 @@
-//
 //  CalculatorViewModel.swift
 //  ExchangeRateCalculator
 //
@@ -17,7 +16,7 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
     typealias Action = ExchangeRateAction
     typealias State = ExchangeRateState
     
-  
+    
     var action: ((ExchangeRateAction) -> Void)?
     
     @Published var state: ExchangeRateState = .idle
@@ -40,9 +39,11 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
                         print("newValue: \(newValue)")
                         let computedAmount = amount * self.rateItem.value
                         self.resultText = ("$\(amount.toDigits(2)) → \(computedAmount.toDigits(2)) \(self.rateItem.currencyCode)")
+                        self.state = .loaded([self.rateItem])
                     }
                 case .failure(let error):
                     print("데이터 로드 실패: \(error)")
+                    self.state = .error
                 }
             }
         }
@@ -52,5 +53,5 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
         currencyLabelText = rateItem.currencyCode
         countryLabelText = rateItem.countryName
     }
-        
+    
 }

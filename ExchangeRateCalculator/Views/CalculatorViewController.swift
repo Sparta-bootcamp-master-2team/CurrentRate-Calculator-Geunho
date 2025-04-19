@@ -42,12 +42,15 @@ final class CalculatorViewController: UIViewController {
         textField.keyboardType = .decimalPad
         textField.textAlignment = .center
         textField.placeholder = "금액을 입력하세요"
+        textField.addTarget(self, action: #selector(didTextFieldChanged(_:)), for: .editingChanged)
+        
         return textField
     }()
     
     private lazy var convertButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = .systemBlue
+        button.isEnabled = false
+        button.backgroundColor = .systemGray
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitle("환율 계산", for: .normal)
         button.layer.cornerRadius = 8
@@ -141,8 +144,20 @@ final class CalculatorViewController: UIViewController {
         viewModel.setNewExchangeRate(validatedInput)
     }
     
+    @objc func didTextFieldChanged(_ sender: UITextField) {
+        viewModel.textInput = sender.text ?? ""
+    }
+    
     // MARK: - Private Methods
     private func bindViewModel() {
+        
+        viewModel.isButtonEnabled
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isEnabled in
+                self?.convertButton.isEnabled = isEnabled
+                self?.convertButton.backgroundColor = isEnabled ? .systemBlue : .lightGray
+            }
+            .store(in: &cancellables)
         
         // Caculator View 정보 설정
         viewModel.$resultText
@@ -160,8 +175,7 @@ final class CalculatorViewController: UIViewController {
             .assign(to: \.text, on: countryLabel)
             .store(in: &cancellables)
         
-        
-        // 상태에 따라 Alert 표시 
+        // 상태에 따라 Alert 표시
         viewModel.$state
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
@@ -197,5 +211,3 @@ final class CalculatorViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
 }
-
-

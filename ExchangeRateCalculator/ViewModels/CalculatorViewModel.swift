@@ -5,7 +5,7 @@
 //
 
 import Foundation
-
+import Combine
 
 final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
     
@@ -23,6 +23,13 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
     @Published var resultText: String?
     @Published var currencyLabelText: String?
     @Published var countryLabelText: String?
+    @Published var textInput: String = ""
+    
+    var isButtonEnabled: AnyPublisher<Bool, Never> {
+        $textInput
+            .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .eraseToAnyPublisher()
+    }
     
     /// 해당 currencyCode에 맞는 환율 정보 새로 업데이트
     func setNewExchangeRate(_ amount: Double) {
@@ -50,7 +57,7 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
             }
         }
     }
-
+    
     func configure() {
         currencyLabelText = rateItem.currencyCode
         countryLabelText = rateItem.countryName

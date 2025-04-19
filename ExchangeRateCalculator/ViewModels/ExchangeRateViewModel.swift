@@ -44,6 +44,7 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
                         
                     case .failure(let error):
                         print("데이터 로드 실패: \(error)")
+                        self.state = .error
                     }
                 }
             }

@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MainViewController.swift
 //  CurrentRateCalculator
 //
 //  Created by 정근호 on 4/15/25.
@@ -7,12 +7,12 @@
 
 import UIKit
 import SnapKit
-import Alamofire
+import Combine
 
-final class ViewController: UIViewController {
-     
-    var rateItems = [RateItem]()
-    var tempRateItems = [RateItem]()
+final class ExchangeRateViewController: UIViewController {
+    
+    let viewModel = ExchangeRateViewModel()
+    var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI Components
     private lazy var searchBar: UISearchBar = {
@@ -47,13 +47,16 @@ final class ViewController: UIViewController {
         
         setUI()
         setLayout()
-        fetchExchangeRateData()
+        bindViewModel()
+        viewModel.setExchangeRate(.fetch)
         setupTapGesture()
     }
     
     // MARK: - UI & Layout
     private func setUI() {
         view.backgroundColor = .systemBackground
+        
+        self.navigationController?.navigationBar.prefersLargeTitles = true
         
         [searchBar, tableView, emptyTextLabel].forEach {
             view.addSubview($0)
@@ -86,77 +89,65 @@ final class ViewController: UIViewController {
     }
 
     // MARK: - Private Methods
+    private func bindViewModel() {
+        print(#function)
+        
+        viewModel.$titleText
+            .sink {
+                self.title = $0
+            }.store(in: &cancellables)
+        
+        // 상태에 따라 emptyTextLabel 표시, Alert 표시 등 동작
+        viewModel.$state
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                guard let self = self else { return }
+                
+                switch state {
+                case .idle:
+                    break
+                case .loaded(let items):
+                    self.emptyTextLabel.isHidden = !items.isEmpty
+                    self.tableView.reloadData()
+                case .error:
+                    self.showAlert(alertTitle: "오류", message: "데이터를 불러올 수 없습니다", actionTitle: "확인")
+                }
+            }.store(in: &cancellables)
+    }
+    
+    
     /// TapGesture 추가, tapGesture.cancelsTouchesInView = false로 뷰 내 터치 정상적으로 동작
     private func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
     }
-    
-    /// 서버 데이터 불러오기 (Alamofire)
-    private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
-        AF.request(url).responseDecodable(of: T.self) { response in
-            completion(response.result)
-        }
-    }
-    
-    /// 환율 정보 불러오기
-    private func fetchExchangeRateData(text: String? = nil) {
-        let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
-        
-        guard let url = urlComponents?.url else {
-            print("잘못된 URL")
-            return
-        }
-        
-        fetchData(url: url) { [weak self] (result: Result<ExchangeRateResponse, AFError>) in
-            guard let self else { return }
-            
-            switch result {
-            case .success(let exchangeResponse):
-                DispatchQueue.main.async {
-                // RateItem 초기화
-                    self.rateItems = exchangeResponse.rates.map { RateItem(currencyCode: $0.key, value: $0.value) }
-                        .sorted { $0.currencyCode < $1.currencyCode }
-                    self.tempRateItems = self.rateItems
-                    self.tableView.reloadData()
-                }
-                
-            case .failure(let error):
-                print("데이터 로드 실패: \(error)")
-                
-                DispatchQueue.main.async {
-                    // Alert 창
-                    let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "확인", style: .default))
-                    self.present(alert, animated: true)
-                }
-            }
-        }
-    }
 }
 
 
 // MARK: - UITableView
-extension ViewController: UITableViewDelegate {
+extension ExchangeRateViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let calculatorView = CalculatorViewController(rateItem: rateItems[indexPath.row])
+        // CalculatorView, CalculatorViewModel 생성
+        let calculatorViewModel = CalculatorViewModel(rateItem: viewModel.rateItems[indexPath.row])
+        
+        let calculatorView = CalculatorViewController(viewModel: calculatorViewModel)
+        
         self.navigationController?.pushViewController(calculatorView, animated: true)
-        calculatorView.configure(rateItem: rateItems[indexPath.row])
     }
 }
 
-extension ViewController: UITableViewDataSource {
+extension ExchangeRateViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return rateItems.count
+        return viewModel.rateItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let item = rateItems[indexPath.row]
+        let item = viewModel.rateItems[indexPath.row]
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateCell.id) as? ExchangeRateCell else {
             return UITableViewCell()
         }
@@ -166,28 +157,13 @@ extension ViewController: UITableViewDataSource {
 }
 
 // MARK: - UISearchBar
-extension ViewController: UISearchBarDelegate {
+extension ExchangeRateViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         guard let text = searchBar.text else { return }
-        filterLoadedData(text: text)
         
-        emptyTextLabel.isHidden = !rateItems.isEmpty
-
+        viewModel.setExchangeRate(.filter(text))
+        
         self.tableView.reloadData()
-    }
-    
-    private func filterLoadedData(text: String) {
-
-        guard !text.isEmpty else {
-            self.rateItems = tempRateItems
-            return
-        }
-
-        self.rateItems = tempRateItems.filter {
-            // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
-            return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
-            $0.countryName.localizedCaseInsensitiveContains(text)
-        }
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

@@ -7,11 +7,12 @@
 
 import UIKit
 import SnapKit
-import Alamofire
+import Combine
 
 final class CalculatorViewController: UIViewController {
-
-    var rateItem: RateItem
+    
+    let viewModel: CalculatorViewModel
+    var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI Components
     private lazy var labelStackView: UIStackView = {
@@ -69,11 +70,13 @@ final class CalculatorViewController: UIViewController {
         setUI()
         setLayout()
         setupTapGesture()
+        bindViewModel()
+        viewModel.configure()
     }
     
     // MARK: - Initializers
-    init(rateItem: RateItem) {
-        self.rateItem = rateItem
+    init(viewModel: CalculatorViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -84,6 +87,9 @@ final class CalculatorViewController: UIViewController {
     // MARK: - UI & Layout
     private func setUI() {
         view.backgroundColor = .systemBackground
+        title = "환율 계산기"
+        
+        self.navigationController?.navigationBar.prefersLargeTitles = true
         
         [labelStackView, amountTextField, convertButton, resultLabel].forEach {
             view.addSubview($0)
@@ -126,78 +132,58 @@ final class CalculatorViewController: UIViewController {
     }
     
     @objc func convertButtonClicked() {
-        fetchNewExchangeRate()
-        if let amount = Double(amountTextField.text!) {
-            let computedAmount = Double(amount) * rateItem.value
-            let result = "$\(amount.toDigits(2)) -> \(computedAmount.toDigits(2)) \(rateItem.currencyCode)"
-            print(result)
-            resultLabel.text = result
-        } else {
-            let alert = UIAlertController(title: "오류", message: "올바른 숫자를 입력해주세요", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "확인", style: .default))
-            self.present(alert, animated: true)
-            amountTextField.text = .none
+        
+        guard let amount = Double(amountTextField.text ?? "") else {
+            self.showAlert(alertTitle: "오류", message: "올바른 숫자를 입력해주세요", actionTitle: "확인")
+            return
         }
+        
+        viewModel.setNewExchangeRate(amount)
     }
     
     // MARK: - Private Methods
+    private func bindViewModel() {
+        
+        // Caculator View 정보 설정
+        viewModel.$resultText
+            .receive(on: RunLoop.main)
+            .assign(to: \.text, on: resultLabel)
+            .store(in: &cancellables)
+        
+        viewModel.$currencyLabelText
+            .receive(on: RunLoop.main)
+            .assign(to: \.text, on: currencyLabel)
+            .store(in: &cancellables)
+        
+        viewModel.$countryLabelText
+            .receive(on: RunLoop.main)
+            .assign(to: \.text, on: countryLabel)
+            .store(in: &cancellables)
+        
+        
+        // 상태에 따라 Alert 표시 
+        viewModel.$state
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                guard let self = self else { return }
+                
+                switch state {
+                case .idle:
+                    break
+                case .loaded(let items):
+                    break
+                case .error:
+                    self.showAlert(alertTitle: "오류", message: "데이터를 불러올 수 없습니다", actionTitle: "확인")
+                }
+            }.store(in: &cancellables)
+    }
+    
     /// TapGesture 추가, tapGesture.cancelsTouchesInView = false로 뷰 내 터치 정상적으로 동작
     private func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
     }
-    
-    // 서버 데이터 불러오기 (Alamofire)
-    private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
-        AF.request(url).responseDecodable(of: T.self) { response in
-            completion(response.result)
-        }
-    }
-    
-    // 해당 currencyCode에 맞는 환율 정보 새로 업데이트
-    private func fetchNewExchangeRate(text: String? = nil) {
-        let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/USD")
-        
-        guard let url = urlComponents?.url else {
-            print("잘못된 URL")
-            return
-        }
-        
-        fetchData(url: url) { [weak self] (result: Result<ExchangeRateResponse, AFError>) in
-            guard let self else { return }
-            
-            switch result {
-            case .success(let exchangeResponse):
-                guard let newValue  = exchangeResponse.rates[self.rateItem.currencyCode] else {
-                    return
-                }
-                self.rateItem.value = newValue
-                print(self.rateItem.value, newValue)
-                
-            case .failure(let error):
-                print("데이터 로드 실패: \(error)")
-                
-                // Alert 창
-                let alert = UIAlertController(title: "오류", message: "데이터를 불러올 수 없습니다", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
-                self.present(alert, animated: true)
-            }
-        }
-    }
-    
-    // MARK: - Internal Methods
-    // Caculator View 정보 설정
-    func configure(rateItem: RateItem) {
-        currencyLabel.text = rateItem.currencyCode
-        countryLabel.text = rateItem.countryName
-        print(rateItem.currencyCode, rateItem.countryName)
-    }
 }
 
-extension Double {
-    // 소수점 자릿수 설정
-    func toDigits(_ digit: Int) -> String {
-        return String(format: "%.\(digit)f", self)
-    }
-}
+

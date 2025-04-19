@@ -133,12 +133,12 @@ final class CalculatorViewController: UIViewController {
     
     @objc func convertButtonClicked() {
         
-        guard let amount = Double(amountTextField.text ?? "") else {
-            self.showAlert(alertTitle: "오류", message: "올바른 숫자를 입력해주세요", actionTitle: "확인")
-            return
-        }
+        guard
+            let input = amountTextField.text,
+            let validatedInput = validateInput(input)
+        else { return }
         
-        viewModel.setNewExchangeRate(amount)
+        viewModel.setNewExchangeRate(validatedInput)
     }
     
     // MARK: - Private Methods
@@ -170,12 +170,24 @@ final class CalculatorViewController: UIViewController {
                 switch state {
                 case .idle:
                     break
-                case .loaded(let items):
+                case .loaded(_):
                     break
                 case .error:
                     self.showAlert(alertTitle: "오류", message: "데이터를 불러올 수 없습니다", actionTitle: "확인")
                 }
             }.store(in: &cancellables)
+    }
+    
+    private func validateInput(_ text: String) -> Double? {
+        
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard let trimmedText = Double(trimmedText) else {
+            self.showAlert(alertTitle: "오류", message: "올바른 숫자를 입력해주세요", actionTitle: "확인")
+            return nil
+        }
+        
+        return trimmedText
     }
     
     /// TapGesture 추가, tapGesture.cancelsTouchesInView = false로 뷰 내 터치 정상적으로 동작

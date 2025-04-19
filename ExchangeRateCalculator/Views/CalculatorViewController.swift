@@ -139,8 +139,13 @@ final class CalculatorViewController: UIViewController {
         guard
             let input = amountTextField.text,
             let validatedInput = validateInput(input)
-        else { return }
-        
+        else {
+            amountTextField.text = ""
+            viewModel.textInput = ""
+            resultLabel.text = ""
+            viewModel.resultText = ""
+            return
+        }
         viewModel.setNewExchangeRate(validatedInput)
     }
     

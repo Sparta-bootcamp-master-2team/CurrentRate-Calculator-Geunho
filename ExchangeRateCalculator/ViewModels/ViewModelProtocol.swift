@@ -14,7 +14,9 @@ enum ExchangeRateState {
 }
 
 enum ExchangeRateAction {
+    /// 초기에 불러올 경우
     case fetch
+    /// 검색값에 의해 필터링 된 경우
     case filter(String)
 }
 
@@ -27,7 +29,7 @@ protocol ViewModelProtocol {
 }
 
 extension Double {
-    // 소수점 자릿수 설정
+    /// 소수점 자릿수 설정
     func toDigits(_ digit: Int) -> String {
         return String(format: "%.\(digit)f", self)
     }

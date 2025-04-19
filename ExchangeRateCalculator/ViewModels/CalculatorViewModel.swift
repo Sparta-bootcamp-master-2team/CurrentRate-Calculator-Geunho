@@ -16,7 +16,6 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
     typealias Action = ExchangeRateAction
     typealias State = ExchangeRateState
     
-    
     var action: ((ExchangeRateAction) -> Void)?
     
     @Published var state: ExchangeRateState = .idle
@@ -34,11 +33,14 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let exchangeResponse):
+                    // 새로 받은 값
                     if let newValue  = exchangeResponse.rates[self.rateItem.currencyCode] {
+                        
                         self.rateItem.value = newValue
-                        print("newValue: \(newValue)")
+                        
                         let computedAmount = amount * self.rateItem.value
                         self.resultText = ("$\(amount.toDigits(2)) → \(computedAmount.toDigits(2)) \(self.rateItem.currencyCode)")
+                        
                         self.state = .loaded([self.rateItem])
                     }
                 case .failure(let error):
@@ -48,7 +50,7 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
             }
         }
     }
-    
+
     func configure() {
         currencyLabelText = rateItem.currencyCode
         countryLabelText = rateItem.countryName

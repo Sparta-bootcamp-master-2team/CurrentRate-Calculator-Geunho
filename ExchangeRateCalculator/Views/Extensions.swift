@@ -15,3 +15,10 @@ extension UIViewController {
         self.present(alert, animated: true)
     }
 }
+
+extension Double {
+    /// 소수점 자릿수 설정
+    func toDigits(_ digit: Int) -> String {
+        return String(format: "%.\(digit)f", self)
+    }
+}

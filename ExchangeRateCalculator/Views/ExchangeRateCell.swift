@@ -42,6 +42,14 @@ final class ExchangeRateCell: UITableViewCell {
         label.textAlignment = .right
         return label
     }()
+    
+    private lazy var favoriteButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "star"), for: .normal)
+        button.tintColor = .systemYellow
+        button.addTarget(self, action: #selector(favoriteButtonClicked), for: .touchUpInside)
+        return button
+    }()
         
     // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -59,7 +67,7 @@ final class ExchangeRateCell: UITableViewCell {
     private func setUI() {
         contentView.backgroundColor = .systemBackground
         
-        [labelStackView, rateLabel].forEach {
+        [labelStackView, rateLabel, favoriteButton].forEach {
             contentView.addSubview($0)
         }
     }
@@ -72,11 +80,21 @@ final class ExchangeRateCell: UITableViewCell {
         }
         
         rateLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(16)
+            make.trailing.equalTo(favoriteButton.snp.leading).offset(-16)
             make.centerY.equalToSuperview()
             make.leading.greaterThanOrEqualTo(labelStackView.snp.trailing).offset(16)
             make.width.equalTo(120)
         }
+        
+        favoriteButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(16)
+            make.centerY.equalToSuperview()
+        }
+    }
+    
+    // MARK: - Actions
+    @objc func favoriteButtonClicked() {
+        
     }
     
     // MARK: - Internal Methods

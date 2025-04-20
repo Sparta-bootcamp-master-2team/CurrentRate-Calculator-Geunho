@@ -9,7 +9,9 @@ import UIKit
 
 final class ExchangeRateCell: UITableViewCell {
         
-    static let id = "ExchangeRateCell"
+    static var id: String {
+        return String(describing: ExchangeRateCell.self)
+    }
     
     // MARK: - UI Components
     private lazy var currencyLabel: UILabel = {

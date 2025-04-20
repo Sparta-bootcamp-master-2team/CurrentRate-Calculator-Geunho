@@ -40,6 +40,7 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let exchangeResponse):
+                    print(exchangeResponse.timeStamp)
                     // 새로 받은 값
                     if let newValue  = exchangeResponse.rates[self.rateItem.currencyCode] {
                         

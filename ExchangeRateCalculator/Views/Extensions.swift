@@ -21,4 +21,11 @@ extension Double {
     func toDigits(_ digit: Int) -> String {
         return String(format: "%.\(digit)f", self)
     }
+    
+    /// 해당 자릿수에서 반올림
+    func round(_ to: Double) -> Double {
+        let multiplier = pow(10.0, to)
+        let rounded = (self * multiplier).rounded() / multiplier
+        return rounded
+    }
 }

@@ -46,7 +46,8 @@ final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
                         self.rateItem.value = newValue
                         
                         let computedAmount = amount * self.rateItem.value
-                        self.resultText = ("$\(amount.toDigits(2)) → \(computedAmount.toDigits(2)) \(self.rateItem.currencyCode)")
+                        print(computedAmount)
+                        self.resultText = ("$\(amount.round(2).toDigits(2)) → \(computedAmount.round(2).toDigits(2)) \(self.rateItem.currencyCode)")
                         
                         self.state = .loaded([self.rateItem])
                     }

@@ -81,13 +81,13 @@ final class ExchangeRateViewController: UIViewController {
         }
     }
     
-
+    
     // MARK: - Action
     /// 키보드 해제
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
-
+    
     // MARK: - Private Methods
     private func bindViewModel() {
         
@@ -148,11 +148,19 @@ extension ExchangeRateViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let item = viewModel.rateItems[indexPath.row]
         let cellViewModel = ExchangeRateCellViewModel(rateItem: item)
-
+        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateCell.id) as? ExchangeRateCell else {
             return UITableViewCell()
         }
         cell.configure(cellViewModel)
+        
+        // 클릭 이벤트 받음(구독), 즐겨찾기 업데이트
+        cellViewModel.favoriteTogglePublisher
+            .sink { [weak self] (currencyCode, isFavorite) in
+                self?.viewModel.updateFavorite(currencyCode: currencyCode, isFavorite: isFavorite)
+            }
+            .store(in: &cancellables)
+        
         return cell
     }
 }

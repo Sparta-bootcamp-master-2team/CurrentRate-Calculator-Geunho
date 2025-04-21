@@ -39,7 +39,6 @@ class CoreDataManager {
                     favoriteCodes.append(currencyCode)
                 }
             }
-            print(favoriteCodes)
         } catch {
             print("읽기 실패")
         }

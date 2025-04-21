@@ -13,6 +13,7 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
     private var favoriteCodes = [String]()
     
     init() {
+        // 즐겨찾기된 currencyCode 저장
         favoriteCodes = coreData.readAllData()
     }
     
@@ -69,11 +70,12 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
         }
     }
     
+    /// 각 요소에 즐겨찾기 상태 적용
     func fetchFavorites(_ favoriteCodes: [String]) {
         for i in 0..<rateItems.count {
             if favoriteCodes.contains(rateItems[i].currencyCode) {
                 rateItems[i].isFavorite = true
-                print(rateItems[i], rateItems[i].isFavorite)
+                print(rateItems[i])
             }
         }
         
@@ -83,7 +85,22 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
             }
             return $0.currencyCode < $1.currencyCode
         }
-        
         tempRateItems = rateItems
+        state = .loaded(rateItems)
+    }
+    
+    /// 클릭 시 즐겨찾기 상태 변경
+    func updateFavorite(currencyCode: String, isFavorite: Bool) {
+        if let index = rateItems.firstIndex(where: { $0.currencyCode == currencyCode }) {
+            rateItems[index].isFavorite = isFavorite
+            rateItems.sort {
+                if $0.isFavorite != $1.isFavorite {
+                    return $0.isFavorite
+                }
+                return $0.currencyCode < $1.currencyCode
+            }
+            tempRateItems = rateItems
+            state = .loaded(rateItems)
+        }
     }
 }

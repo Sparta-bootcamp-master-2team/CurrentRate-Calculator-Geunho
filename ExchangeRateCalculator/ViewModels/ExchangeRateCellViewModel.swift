@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class ExchangeRateCellViewModel: ObservableObject {
     
@@ -15,7 +16,10 @@ class ExchangeRateCellViewModel: ObservableObject {
     @Published var rateLabelText: String?
     @Published var countryLabelText: String?
     @Published var isFavorite: Bool
-
+    
+    // 버튼 클릭 이벤트
+    let favoriteTogglePublisher = PassthroughSubject<(String, Bool), Never>()
+    
     init(rateItem: RateItem) {
         self.rateItem = rateItem
         self.isFavorite = rateItem.isFavorite
@@ -28,6 +32,7 @@ class ExchangeRateCellViewModel: ObservableObject {
         countryLabelText = rateItem.countryName
     }
     
+    /// 즐겨찾기 상태 설정
     func setFavoriteStatus() {
         rateItem.isFavorite.toggle()
         self.isFavorite = rateItem.isFavorite
@@ -36,5 +41,7 @@ class ExchangeRateCellViewModel: ObservableObject {
         } else {
             coreData.deleteData(selectedCode: rateItem.currencyCode)
         }
+        // 클릭 이벤트 send
+        favoriteTogglePublisher.send((rateItem.currencyCode, rateItem.isFavorite))
     }
 }

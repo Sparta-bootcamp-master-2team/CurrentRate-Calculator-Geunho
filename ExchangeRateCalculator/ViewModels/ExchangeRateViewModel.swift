@@ -42,13 +42,11 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
                             RateItem(currencyCode: $0.key, value: $0.value)
                         }.sorted {
                             $0.currencyCode < $1.currencyCode
-                            
                         }
                         
                         self.rateItems = items
                         self.tempRateItems = items
                         self.state = .loaded(items)
-                        
                         self.fetchFavorites(self.favoriteCodes)
                         
                     case .failure(let error):
@@ -71,12 +69,21 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
         }
     }
     
-    private func fetchFavorites(_ favoriteCodes: [String]) {
+    func fetchFavorites(_ favoriteCodes: [String]) {
         for i in 0..<rateItems.count {
             if favoriteCodes.contains(rateItems[i].currencyCode) {
                 rateItems[i].isFavorite = true
                 print(rateItems[i], rateItems[i].isFavorite)
             }
         }
+        
+        rateItems.sort {
+            if $0.isFavorite != $1.isFavorite {
+                return $0.isFavorite
+            }
+            return $0.currencyCode < $1.currencyCode
+        }
+        
+        tempRateItems = rateItems
     }
 }

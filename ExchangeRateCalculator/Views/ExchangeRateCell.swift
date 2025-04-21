@@ -6,9 +6,13 @@
 //
 
 import UIKit
+import Combine
 
 final class ExchangeRateCell: UITableViewCell {
-        
+    
+    private var viewModel: ExchangeRateCellViewModel?
+    private var cancellables = Set<AnyCancellable>()
+    
     static var id: String {
         return String(describing: ExchangeRateCell.self)
     }
@@ -45,12 +49,11 @@ final class ExchangeRateCell: UITableViewCell {
     
     private lazy var favoriteButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "star"), for: .normal)
         button.tintColor = .systemYellow
         button.addTarget(self, action: #selector(favoriteButtonClicked), for: .touchUpInside)
         return button
     }()
-        
+    
     // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -73,7 +76,7 @@ final class ExchangeRateCell: UITableViewCell {
     }
     
     private func setLayout() {
-
+        
         labelStackView.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(16)
             make.centerY.equalToSuperview()
@@ -94,14 +97,40 @@ final class ExchangeRateCell: UITableViewCell {
     
     // MARK: - Actions
     @objc func favoriteButtonClicked() {
-        
+        viewModel?.isFavorite.toggle()
     }
     
-    // MARK: - Internal Methods
-    /// Cell 정보 설정
-    func configure(rateItem: RateItem) {
-        currencyLabel.text = rateItem.currencyCode
-        rateLabel.text = rateItem.value.toDigits(4)
-        countryLabel.text = rateItem.countryName
+    // MARK: - Private Methods
+    private func bindViewModel() {
+        viewModel?.$currencyLabelText
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.text, on: currencyLabel)
+            .store(in: &cancellables)
+        
+        viewModel?.$rateLabelText
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.text, on: rateLabel)
+            .store(in: &cancellables)
+        
+        viewModel?.$countryLabelText
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.text, on: countryLabel)
+            .store(in: &cancellables)
+        
+        viewModel?.$isFavorite
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                let image = $0 ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+                self?.favoriteButton.setImage(image, for: .normal)
+            }
+            .store(in: &cancellables)
+    }
+    
+    
+    func configure(_ viewModel: ExchangeRateCellViewModel) {
+        self.viewModel = viewModel
+        self.viewModel?.configure()
+        
+        bindViewModel()
     }
 }

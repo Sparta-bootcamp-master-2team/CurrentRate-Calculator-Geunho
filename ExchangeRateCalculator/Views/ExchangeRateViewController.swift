@@ -148,10 +148,12 @@ extension ExchangeRateViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let item = viewModel.rateItems[indexPath.row]
+        let cellViewModel = ExchangeRateCellViewModel(rateItem: item)
+
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateCell.id) as? ExchangeRateCell else {
             return UITableViewCell()
         }
-        cell.configure(rateItem: item)
+        cell.configure(cellViewModel)
         return cell
     }
 }

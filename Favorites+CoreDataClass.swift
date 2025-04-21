@@ -14,6 +14,6 @@ public class Favorites: NSManagedObject {
     public static let className = String(describing: Favorites.self)
     
     public enum Key {
-        static let currencyCode = String(describing: Favorites.self.Key)
+        static let currencyCode = "currencyCode"
     }
 }

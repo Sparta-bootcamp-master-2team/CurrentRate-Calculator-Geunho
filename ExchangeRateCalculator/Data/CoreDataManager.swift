@@ -10,11 +10,9 @@ import UIKit
 
 class CoreDataManager {
     
-    var container: NSPersistentContainer!
+    private var container: NSPersistentContainer!
     
-    init(container: NSPersistentContainer!) {
-        self.container = container
-        
+    init() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         self.container = appDelegate.persistentContainer
     }
@@ -32,17 +30,20 @@ class CoreDataManager {
         }
     }
     
-    func readAllData() {
+    func readAllData() -> [String] {
+        var favoriteCodes = [String]()
         do {
             let favorites = try self.container.viewContext.fetch(Favorites.fetchRequest())
             for favorite in favorites as [NSManagedObject]{
                 if let currencyCode = favorite.value(forKey: Favorites.Key.currencyCode) as? String {
-                    print("currencyCode in CoreData: \(currencyCode)")
+                    favoriteCodes.append(currencyCode)
                 }
             }
+            print(favoriteCodes)
         } catch {
             print("읽기 실패")
         }
+        return favoriteCodes
     }
     
     func deleteData(selectedCode: String) {
@@ -60,5 +61,4 @@ class CoreDataManager {
             print("삭제 실패")
         }
     }
-    
 }

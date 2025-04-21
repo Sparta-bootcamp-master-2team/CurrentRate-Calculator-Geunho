@@ -157,7 +157,7 @@ final class CalculatorViewController: UIViewController {
     private func bindViewModel() {
         
         viewModel.isButtonEnabled
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] isEnabled in
                 self?.convertButton.isEnabled = isEnabled
                 self?.convertButton.backgroundColor = isEnabled ? .systemBlue : .lightGray
@@ -166,23 +166,23 @@ final class CalculatorViewController: UIViewController {
         
         // Caculator View 정보 설정
         viewModel.$resultText
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .assign(to: \.text, on: resultLabel)
             .store(in: &cancellables)
         
         viewModel.$currencyLabelText
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .assign(to: \.text, on: currencyLabel)
             .store(in: &cancellables)
         
         viewModel.$countryLabelText
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .assign(to: \.text, on: countryLabel)
             .store(in: &cancellables)
         
         // 상태에 따라 Alert 표시
         viewModel.$state
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 guard let self = self else { return }
                 

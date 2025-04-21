@@ -90,7 +90,6 @@ final class ExchangeRateViewController: UIViewController {
 
     // MARK: - Private Methods
     private func bindViewModel() {
-        print(#function)
         
         viewModel.$titleText
             .sink {

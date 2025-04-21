@@ -97,7 +97,7 @@ final class ExchangeRateCell: UITableViewCell {
     
     // MARK: - Actions
     @objc func favoriteButtonClicked() {
-        viewModel?.isFavorite.toggle()
+        viewModel?.setFavoriteStatus()
     }
     
     // MARK: - Private Methods
@@ -130,7 +130,7 @@ final class ExchangeRateCell: UITableViewCell {
     func configure(_ viewModel: ExchangeRateCellViewModel) {
         self.viewModel = viewModel
         self.viewModel?.configure()
-        
+
         bindViewModel()
     }
 }

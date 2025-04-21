@@ -21,6 +21,7 @@ struct ExchangeRateResponse: Codable {
 struct RateItem {
     let currencyCode: String
     var value: Double
+    var isFavorite: Bool = false
     var countryName: String {
         RateItem.countryMap[currencyCode] ?? "Unknown"
     }

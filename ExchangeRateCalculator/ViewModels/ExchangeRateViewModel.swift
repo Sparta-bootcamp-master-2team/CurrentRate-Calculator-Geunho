@@ -9,8 +9,11 @@ import Foundation
 
 final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
     
+    private let coreData = CoreDataManager()
+    private var favoriteCodes = [String]()
+    
     init() {
-        print(#function)
+        favoriteCodes = coreData.readAllData()
     }
     
     typealias Action = ExchangeRateAction
@@ -34,13 +37,19 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let response):
+                        
                         let items = response.rates.map {
                             RateItem(currencyCode: $0.key, value: $0.value)
-                        }.sorted { $0.currencyCode < $1.currencyCode }
+                        }.sorted {
+                            $0.currencyCode < $1.currencyCode
+                            
+                        }
                         
                         self.rateItems = items
                         self.tempRateItems = items
                         self.state = .loaded(items)
+                        
+                        self.fetchFavorites(self.favoriteCodes)
                         
                     case .failure(let error):
                         print("데이터 로드 실패: \(error)")
@@ -58,6 +67,15 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
                 // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
                 return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
                 $0.countryName.localizedCaseInsensitiveContains(text)
+            }
+        }
+    }
+    
+    private func fetchFavorites(_ favoriteCodes: [String]) {
+        for i in 0..<rateItems.count {
+            if favoriteCodes.contains(rateItems[i].currencyCode) {
+                rateItems[i].isFavorite = true
+                print(rateItems[i], rateItems[i].isFavorite)
             }
         }
     }

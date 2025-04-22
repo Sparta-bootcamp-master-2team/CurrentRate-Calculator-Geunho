@@ -65,6 +65,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
                 $0.countryName.localizedCaseInsensitiveContains(text)
             }
+            self.state = .loaded(self.rateItems)
         }
     }
     

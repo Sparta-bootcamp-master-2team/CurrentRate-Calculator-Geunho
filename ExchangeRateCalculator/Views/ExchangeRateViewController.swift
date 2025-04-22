@@ -79,7 +79,7 @@ final class ExchangeRateViewController: UIViewController {
         
         emptyTextLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.centerY.equalTo(tableView)
+            make.centerY.equalToSuperview()
         }
     }
     
@@ -165,7 +165,10 @@ extension ExchangeRateViewController: UITableViewDataSource {
 // MARK: - UISearchBar
 extension ExchangeRateViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        guard let text = searchBar.text else { return }
+        guard let text = searchBar.text else {
+            emptyTextLabel.isHidden = true
+            return
+        }
         
         viewModel.setExchangeRate(.filter(text))
         

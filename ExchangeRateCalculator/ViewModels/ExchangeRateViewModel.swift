@@ -55,18 +55,19 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 }
             }
         case .filter(let text):
-            guard !text.isEmpty else {
+            if text.isEmpty {
                 self.rateItems = tempRateItems
                 self.state = .loaded(self.rateItems)
-                return
+            } else {
+                self.rateItems = tempRateItems.filter {
+                    // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
+                    return $0.currencyCode
+                        .localizedCaseInsensitiveContains(text) ||
+                            $0.countryName
+                        .localizedCaseInsensitiveContains(text)
+                }
+                self.state = .loaded(self.rateItems)
             }
-            
-            self.rateItems = tempRateItems.filter {
-                // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
-                return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
-                $0.countryName.localizedCaseInsensitiveContains(text)
-            }
-            self.state = .loaded(self.rateItems)
         }
     }
     

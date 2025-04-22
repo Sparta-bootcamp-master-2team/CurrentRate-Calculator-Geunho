@@ -54,6 +54,8 @@ final class ExchangeRateCell: UITableViewCell {
         return button
     }()
     
+    
+    
     // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

@@ -165,10 +165,7 @@ extension ExchangeRateViewController: UITableViewDataSource {
 // MARK: - UISearchBar
 extension ExchangeRateViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        guard let text = searchBar.text else {
-            emptyTextLabel.isHidden = true
-            return
-        }
+        guard let text = searchBar.text else { return }
         
         viewModel.setExchangeRate(.filter(text))
         

@@ -57,6 +57,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         case .filter(let text):
             guard !text.isEmpty else {
                 self.rateItems = tempRateItems
+                self.state = .loaded(self.rateItems)
                 return
             }
             

@@ -55,7 +55,6 @@ final class ExchangeRateCell: UITableViewCell {
     }()
     
     
-    
     // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -118,6 +117,8 @@ final class ExchangeRateCell: UITableViewCell {
                     self?.favoriteButton.setImage(image, for: .normal)
                 }
                 .store(in: &cancellables)
+        
+        
     }
 }
 

@@ -11,7 +11,7 @@ import UIKit
 class CoreDataManager {
     
     private var container: NSPersistentContainer!
-    
+        
     init() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         self.container = appDelegate.persistentContainer

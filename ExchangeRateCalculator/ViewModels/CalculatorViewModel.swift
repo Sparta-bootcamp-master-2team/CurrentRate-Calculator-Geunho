@@ -7,7 +7,7 @@
 import Foundation
 import Combine
 
-final class CalculatorViewModel: ViewModelProtocol, ObservableObject {
+final class CalculatorViewModel: ViewModelProtocol {
     
     init(rateItem: RateItem) {
         self.rateItem = rateItem

@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
+final class ExchangeRateViewModel: ViewModelProtocol {
     
     private let coreData = CoreDataManager()
     private var favoriteCodes = [String]()

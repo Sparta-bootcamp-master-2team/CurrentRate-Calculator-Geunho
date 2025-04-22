@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class ExchangeRateCellViewModel: ObservableObject {
+class ExchangeRateCellViewModel {
     
     private let coreData = CoreDataManager()
     @Published var rateItem: RateItem

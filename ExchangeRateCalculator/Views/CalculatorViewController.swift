@@ -166,12 +166,6 @@ final class CalculatorViewController: UIViewController {
             }
             .store(in: &cancellables)
         
-        // Caculator View 정보 설정
-        viewModel.$resultText
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.text, on: resultLabel)
-            .store(in: &cancellables)
-        
         // 상태에 따라 Alert 표시
         viewModel.$state
             .receive(on: DispatchQueue.main)
@@ -179,10 +173,8 @@ final class CalculatorViewController: UIViewController {
                 guard let self = self else { return }
                 
                 switch state {
-                case .idle:
-                    break
-                case .loaded(_):
-                    break
+                case .loaded(let result):
+                    self.resultLabel.text = result
                 case .error:
                     self.showAlert(alertTitle: "오류", message: "데이터를 불러올 수 없습니다", actionTitle: "확인")
                 }

@@ -7,21 +7,21 @@
 import Foundation
 import Combine
 
-final class CalculatorViewModel: ViewModelProtocol {
+enum CalculatorState {
+    case loaded(String?)
+    case error
+}
+
+final class CalculatorViewModel {
     
     init(rateItem: RateItem) {
         self.rateItem = rateItem
     }
     
-    typealias Action = ExchangeRateAction
-    typealias State = ExchangeRateState
-    
-    var action: ((ExchangeRateAction) -> Void)?
-    
-    @Published var state: ExchangeRateState = .idle
+    @Published var state: CalculatorState = .loaded(nil)
     @Published var rateItem: RateItem
-    @Published var resultText: String?
     @Published var textInput: String = ""
+    var resultText: String = ""
     
     var isButtonEnabled: AnyPublisher<Bool, Never> {
         $textInput
@@ -48,7 +48,7 @@ final class CalculatorViewModel: ViewModelProtocol {
                         print(computedAmount)
                         self.resultText = ("$\(amount.round(2).toDigits(2)) → \(computedAmount.round(2).toDigits(2)) \(self.rateItem.currencyCode)")
                         
-                        self.state = .loaded([self.rateItem])
+                        self.state = .loaded(self.resultText)
                     }
                 case .failure(let error):
                     print("데이터 로드 실패: \(error)")

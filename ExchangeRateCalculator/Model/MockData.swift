@@ -8,7 +8,8 @@
 import Foundation
 
 struct MockData {
-    static let mockRates: [String: Double] = [
+    let timeStamp: Int64 = 1
+    let rates: [String: Double] = [
         "AED": 3.709225,
         "AFN": 71.289331,
         "ALL": 87.614933,
@@ -172,5 +173,4 @@ struct MockData {
         "ZMW": 28.859506,
         "ZWL": 26.531406
     ]
-    
 }

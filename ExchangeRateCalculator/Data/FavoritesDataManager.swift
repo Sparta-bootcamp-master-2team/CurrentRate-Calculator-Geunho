@@ -8,7 +8,7 @@
 import CoreData
 import UIKit
 
-class CoreDataManager {
+class FavoritesDataManager {
     
     private var container: NSPersistentContainer!
         

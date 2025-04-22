@@ -10,7 +10,7 @@ import Combine
 
 class ExchangeRateCellViewModel {
     
-    private let coreData = CoreDataManager()
+    private let coreData = FavoritesDataManager()
     @Published var rateItem: RateItem
     @Published var isFavorite: Bool
     
@@ -20,6 +20,7 @@ class ExchangeRateCellViewModel {
     init(rateItem: RateItem) {
         self.rateItem = rateItem
         self.isFavorite = rateItem.isFavorite
+        
     }
     
     /// 즐겨찾기 상태 설정

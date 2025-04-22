@@ -9,7 +9,7 @@ import Foundation
 
 final class ExchangeRateViewModel: ViewModelProtocol {
     
-    private let coreData = CoreDataManager()
+    private let coreData = FavoritesDataManager()
     private var favoriteCodes = [String]()
     
     init() {
@@ -25,14 +25,14 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     @Published var state: ExchangeRateState = .idle
     var rateItems = [RateItem]()
     var allRateItems = [RateItem]()
-    
+        
     func setExchangeRate(_ action: ExchangeRateAction) {
         
         switch action {
         case .fetch:
             NetworkManager.shared.fetchData { [weak self] (result: Result<ExchangeRateResponse, Error>) in
                 guard let self = self else { return }
-                
+                                
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let response):
@@ -113,6 +113,16 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         }
         // 업데이트 된 rateItems으로 reload
         state = .loaded(rateItems)
+    }
+    
+    func compareWithPrevData(old: MockData, new: ExchangeRateResponse){
+        for i in old.rates.indices {
+            if abs(new.rates[i].value - old.rates[i].value) > 0.01 {
+                
+            } else {
+                
+            }
+        }
     }
 }
 

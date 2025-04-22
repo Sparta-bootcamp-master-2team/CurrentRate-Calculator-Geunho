@@ -21,8 +21,6 @@ final class CalculatorViewModel: ViewModelProtocol {
     @Published var state: ExchangeRateState = .idle
     @Published var rateItem: RateItem
     @Published var resultText: String?
-    @Published var currencyLabelText: String?
-    @Published var countryLabelText: String?
     @Published var textInput: String = ""
     
     var isButtonEnabled: AnyPublisher<Bool, Never> {
@@ -58,11 +56,6 @@ final class CalculatorViewModel: ViewModelProtocol {
                 }
             }
         }
-    }
-    
-    func configure() {
-        currencyLabelText = rateItem.currencyCode
-        countryLabelText = rateItem.countryName
     }
     
 }

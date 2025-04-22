@@ -74,7 +74,7 @@ final class CalculatorViewController: UIViewController {
         setLayout()
         setupTapGesture()
         bindViewModel()
-        viewModel.configure()
+        configure()
     }
     
     // MARK: - Initializers
@@ -170,16 +170,6 @@ final class CalculatorViewController: UIViewController {
             .assign(to: \.text, on: resultLabel)
             .store(in: &cancellables)
         
-        viewModel.$currencyLabelText
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.text, on: currencyLabel)
-            .store(in: &cancellables)
-        
-        viewModel.$countryLabelText
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.text, on: countryLabel)
-            .store(in: &cancellables)
-        
         // 상태에 따라 Alert 표시
         viewModel.$state
             .receive(on: DispatchQueue.main)
@@ -214,5 +204,11 @@ final class CalculatorViewController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
+    }
+    
+    private func configure() {
+        // 불필요한 Combine 바인딩 제거, 초기 진입 시 1번만 반영하면 됨
+        currencyLabel.text = viewModel.rateItem.currencyCode
+        countryLabel.text = viewModel.rateItem.countryName
     }
 }

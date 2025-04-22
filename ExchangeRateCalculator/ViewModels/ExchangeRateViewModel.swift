@@ -23,10 +23,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     var action: ((ExchangeRateAction) -> Void)?
     
     @Published var state: ExchangeRateState = .idle
-    @Published var rateItems = [RateItem]()
-    @Published var tempRateItems = [RateItem]()
-    // Test
-    @Published var titleText: String = "환율 정보"
+    var rateItems = [RateItem]()
+    var tempRateItems = [RateItem]()
     
     func setExchangeRate(_ action: ExchangeRateAction) {
         

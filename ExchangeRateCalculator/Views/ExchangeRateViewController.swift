@@ -150,7 +150,7 @@ extension ExchangeRateViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateCell.id) as? ExchangeRateCell else {
             return UITableViewCell()
         }
-        cell.configure(cellViewModel)
+        cell.bindViewModel(cellViewModel)
         
         // 클릭 이벤트 받음(구독), 즐겨찾기 업데이트
         cellViewModel.favoriteTogglePublisher

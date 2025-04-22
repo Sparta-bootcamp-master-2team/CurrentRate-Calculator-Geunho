@@ -74,7 +74,6 @@ final class CalculatorViewController: UIViewController {
         setLayout()
         setupTapGesture()
         bindViewModel()
-        configure()
     }
     
     // MARK: - Initializers
@@ -156,6 +155,9 @@ final class CalculatorViewController: UIViewController {
     // MARK: - Private Methods
     private func bindViewModel() {
         
+        currencyLabel.text = viewModel.rateItem.currencyCode
+        countryLabel.text = viewModel.rateItem.countryName
+        
         viewModel.isButtonEnabled
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isEnabled in
@@ -204,11 +206,5 @@ final class CalculatorViewController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
-    }
-    
-    private func configure() {
-        // 불필요한 Combine 바인딩 제거, 초기 진입 시 1번만 반영하면 됨
-        currencyLabel.text = viewModel.rateItem.currencyCode
-        countryLabel.text = viewModel.rateItem.countryName
     }
 }

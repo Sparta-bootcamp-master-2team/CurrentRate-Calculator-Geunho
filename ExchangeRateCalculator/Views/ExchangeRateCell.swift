@@ -100,37 +100,21 @@ final class ExchangeRateCell: UITableViewCell {
         viewModel?.setFavoriteStatus()
     }
     
-    // MARK: - Private Methods
-    private func bindViewModel() {
-        viewModel?.$currencyLabelText
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.text, on: currencyLabel)
-            .store(in: &cancellables)
-        
-        viewModel?.$rateLabelText
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.text, on: rateLabel)
-            .store(in: &cancellables)
-        
-        viewModel?.$countryLabelText
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.text, on: countryLabel)
-            .store(in: &cancellables)
-        
-        viewModel?.$isFavorite
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                let image = $0 ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
-                self?.favoriteButton.setImage(image, for: .normal)
-            }
-            .store(in: &cancellables)
-    }
-    
-    
-    func configure(_ viewModel: ExchangeRateCellViewModel) {
+    // MARK: - Internal Methods
+    func bindViewModel(_ viewModel: ExchangeRateCellViewModel) {
         self.viewModel = viewModel
-        self.viewModel?.configure()
+        
+        currencyLabel.text = viewModel.rateItem.currencyCode
+        rateLabel.text = viewModel.rateItem.value.toDigits(4)
+        countryLabel.text = viewModel.rateItem.countryName
 
-        bindViewModel()
+        viewModel.$isFavorite
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] in
+                    let image = $0 ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+                    self?.favoriteButton.setImage(image, for: .normal)
+                }
+                .store(in: &cancellables)
     }
 }
+

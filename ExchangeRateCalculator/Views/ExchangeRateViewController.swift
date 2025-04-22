@@ -103,6 +103,7 @@ final class ExchangeRateViewController: UIViewController {
                 case .idle:
                     break
                 case .loaded(let items):
+                    // 검색 결과 없을 시 "검색 결과 없음" 표시
                     self.emptyTextLabel.isHidden = !items.isEmpty
                     self.tableView.reloadData()
                 case .error:
@@ -170,10 +171,6 @@ extension ExchangeRateViewController: UISearchBarDelegate {
         viewModel.setExchangeRate(.filter(text))
         
         self.tableView.reloadData()
-    }
-    
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        dismissKeyboard()
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {

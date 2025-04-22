@@ -31,7 +31,7 @@ class ExchangeRateCellViewModel {
         } else {
             coreData.deleteData(selectedCode: rateItem.currencyCode)
         }
-        // 클릭 이벤트 send
+        // 클릭 이벤트 send (ExchangeRateViewController: UITableViewDataSource에서 받음)
         favoriteTogglePublisher.send((rateItem.currencyCode, rateItem.isFavorite))
     }
 }

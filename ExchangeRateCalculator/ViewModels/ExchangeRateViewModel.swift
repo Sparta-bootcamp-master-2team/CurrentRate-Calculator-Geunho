@@ -44,9 +44,10 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                         }
                         
                         self.rateItems = items
-                        self.tempRateItems = items
-                        self.state = .loaded(items)
                         self.fetchFavorites(self.favoriteCodes)
+                        self.tempRateItems = self.rateItems
+                        self.state = .loaded(self.tempRateItems)
+
                         
                     case .failure(let error):
                         print("데이터 로드 실패: \(error)")
@@ -71,7 +72,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         }
     }
     
-    /// 각 요소에 즐겨찾기 상태 적용
+    /// 각 요소에 즐겨찾기 상태 적용 (fetch 시 한 번)
     func fetchFavorites(_ favoriteCodes: [String]) {
         for i in 0..<rateItems.count {
             if favoriteCodes.contains(rateItems[i].currencyCode) {
@@ -86,21 +87,31 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             }
             return $0.currencyCode < $1.currencyCode
         }
-        tempRateItems = rateItems
-        state = .loaded(rateItems)
     }
     
     /// 클릭 시 즐겨찾기 상태 변경
     func updateFavorite(currencyCode: String, isFavorite: Bool) {
         if let index = rateItems.firstIndex(where: { $0.currencyCode == currencyCode }) {
             rateItems[index].isFavorite = isFavorite
+            
+            if let tempIndex = tempRateItems.firstIndex(where: { $0.currencyCode == rateItems[index].currencyCode}) {
+                tempRateItems[tempIndex].isFavorite = isFavorite
+            }
+            
             rateItems.sort {
                 if $0.isFavorite != $1.isFavorite {
                     return $0.isFavorite
                 }
                 return $0.currencyCode < $1.currencyCode
             }
-            tempRateItems = rateItems
+            
+            tempRateItems.sort {
+                if $0.isFavorite != $1.isFavorite {
+                    return $0.isFavorite
+                }
+                return $0.currencyCode < $1.currencyCode
+            }
+            // 업데이트 된 rateItems으로 reload
             state = .loaded(rateItems)
         }
     }

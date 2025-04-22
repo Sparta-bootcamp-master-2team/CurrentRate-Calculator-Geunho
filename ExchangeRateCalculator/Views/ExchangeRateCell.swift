@@ -97,6 +97,7 @@ final class ExchangeRateCell: UITableViewCell {
     
     // MARK: - Actions
     @objc func favoriteButtonClicked() {
+        // 클릭 시 즐겨찾기 상태 설정
         viewModel?.setFavoriteStatus()
     }
     

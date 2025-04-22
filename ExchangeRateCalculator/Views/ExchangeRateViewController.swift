@@ -13,6 +13,7 @@ final class ExchangeRateViewController: UIViewController {
     
     let viewModel = ExchangeRateViewModel()
     var cancellables = Set<AnyCancellable>()
+    let cachedRateData = CachedRateDataManager()
     
     // MARK: - UI Components
     private lazy var searchBar: UISearchBar = {

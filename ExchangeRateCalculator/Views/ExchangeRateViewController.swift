@@ -56,7 +56,7 @@ final class ExchangeRateViewController: UIViewController {
     private func setUI() {
         view.backgroundColor = .systemBackground
         self.title = "환율 정보"
-
+        
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         
@@ -92,7 +92,7 @@ final class ExchangeRateViewController: UIViewController {
     
     // MARK: - Private Methods
     private func bindViewModel() {
-
+        
         // 상태에 따라 emptyTextLabel 표시, Alert 표시 등 동작
         viewModel.$state
             .receive(on: DispatchQueue.main)

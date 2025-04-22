@@ -24,7 +24,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     
     @Published var state: ExchangeRateState = .idle
     var rateItems = [RateItem]()
-    var tempRateItems = [RateItem]()
+    var allRateItems = [RateItem]()
     
     func setExchangeRate(_ action: ExchangeRateAction) {
         
@@ -43,11 +43,9 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                             $0.currencyCode < $1.currencyCode
                         }
                         
-                        self.rateItems = items
+                        self.allRateItems = items
                         self.fetchFavorites(self.favoriteCodes)
-                        self.tempRateItems = self.rateItems
-                        self.state = .loaded(self.tempRateItems)
-
+                        self.state = .loaded(self.rateItems)
                         
                     case .failure(let error):
                         print("데이터 로드 실패: \(error)")
@@ -57,28 +55,54 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             }
         case .filter(let text):
             if text.isEmpty {
-                self.rateItems = tempRateItems
+                self.rateItems = allRateItems
                 self.state = .loaded(self.rateItems)
             } else {
-                self.rateItems = tempRateItems.filter {
+                self.rateItems = allRateItems.filter {
                     // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
-                    return $0.currencyCode
-                        .localizedCaseInsensitiveContains(text) ||
-                            $0.countryName
-                        .localizedCaseInsensitiveContains(text)
+                    return $0.currencyCode.localizedCaseInsensitiveContains(text)
+                    || $0.countryName.localizedCaseInsensitiveContains(text)
                 }
                 self.state = .loaded(self.rateItems)
             }
         }
     }
     
-    /// 각 요소에 즐겨찾기 상태 적용 (fetch 시 한 번)
+    /// 각 요소에 즐겨찾기 상태 적용 (fetch 시 한 번), rateItems 설정
     func fetchFavorites(_ favoriteCodes: [String]) {
-        for i in 0..<rateItems.count {
-            if favoriteCodes.contains(rateItems[i].currencyCode) {
-                rateItems[i].isFavorite = true
-                print(rateItems[i])
+        for i in 0..<allRateItems.count {
+            if favoriteCodes.contains(allRateItems[i].currencyCode) {
+                allRateItems[i].isFavorite = true
+                print(allRateItems[i])
             }
+        }
+        
+        allRateItems.sort {
+            if $0.isFavorite != $1.isFavorite {
+                return $0.isFavorite
+            }
+            return $0.currencyCode < $1.currencyCode
+        }
+        
+        // rateItems 값 업데이트
+        self.rateItems = allRateItems
+    }
+    
+    /// 클릭 시 즐겨찾기 상태 변경
+    func updateFavorite(currencyCode: String, isFavorite: Bool) {
+        if let index = allRateItems.firstIndex(where: { $0.currencyCode == currencyCode }) {
+            allRateItems[index].isFavorite = isFavorite
+        }
+        
+        if let index = rateItems.firstIndex(where: { $0.currencyCode == currencyCode}) {
+            rateItems[index].isFavorite = isFavorite
+        }
+        
+        allRateItems.sort {
+            if $0.isFavorite != $1.isFavorite {
+                return $0.isFavorite
+            }
+            return $0.currencyCode < $1.currencyCode
         }
         
         rateItems.sort {
@@ -87,32 +111,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             }
             return $0.currencyCode < $1.currencyCode
         }
-    }
-    
-    /// 클릭 시 즐겨찾기 상태 변경
-    func updateFavorite(currencyCode: String, isFavorite: Bool) {
-        if let index = rateItems.firstIndex(where: { $0.currencyCode == currencyCode }) {
-            rateItems[index].isFavorite = isFavorite
-            
-            if let tempIndex = tempRateItems.firstIndex(where: { $0.currencyCode == rateItems[index].currencyCode}) {
-                tempRateItems[tempIndex].isFavorite = isFavorite
-            }
-            
-            rateItems.sort {
-                if $0.isFavorite != $1.isFavorite {
-                    return $0.isFavorite
-                }
-                return $0.currencyCode < $1.currencyCode
-            }
-            
-            tempRateItems.sort {
-                if $0.isFavorite != $1.isFavorite {
-                    return $0.isFavorite
-                }
-                return $0.currencyCode < $1.currencyCode
-            }
-            // 업데이트 된 rateItems으로 reload
-            state = .loaded(rateItems)
-        }
+        // 업데이트 된 rateItems으로 reload
+        state = .loaded(rateItems)
     }
 }
+

@@ -6,10 +6,16 @@
 //
 
 import UIKit
+import Combine
 
 final class ExchangeRateCell: UITableViewCell {
-        
-    static let id = "ExchangeRateCell"
+    
+    private var viewModel: ExchangeRateCellViewModel?
+    private var cancellables = Set<AnyCancellable>()
+    
+    static var id: String {
+        return String(describing: ExchangeRateCell.self)
+    }
     
     // MARK: - UI Components
     private lazy var currencyLabel: UILabel = {
@@ -40,7 +46,14 @@ final class ExchangeRateCell: UITableViewCell {
         label.textAlignment = .right
         return label
     }()
-        
+    
+    private lazy var favoriteButton: UIButton = {
+        let button = UIButton()
+        button.tintColor = .systemYellow
+        button.addTarget(self, action: #selector(favoriteButtonClicked), for: .touchUpInside)
+        return button
+    }()
+    
     // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -57,31 +70,52 @@ final class ExchangeRateCell: UITableViewCell {
     private func setUI() {
         contentView.backgroundColor = .systemBackground
         
-        [labelStackView, rateLabel].forEach {
+        [labelStackView, rateLabel, favoriteButton].forEach {
             contentView.addSubview($0)
         }
     }
     
     private func setLayout() {
-
+        
         labelStackView.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(16)
             make.centerY.equalToSuperview()
         }
         
         rateLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(16)
+            make.trailing.equalTo(favoriteButton.snp.leading).offset(-16)
             make.centerY.equalToSuperview()
             make.leading.greaterThanOrEqualTo(labelStackView.snp.trailing).offset(16)
             make.width.equalTo(120)
         }
+        
+        favoriteButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(16)
+            make.centerY.equalToSuperview()
+        }
+    }
+    
+    // MARK: - Actions
+    @objc func favoriteButtonClicked() {
+        // 클릭 시 즐겨찾기 상태 설정
+        viewModel?.setFavoriteStatus()
     }
     
     // MARK: - Internal Methods
-    /// Cell 정보 설정
-    func configure(rateItem: RateItem) {
-        currencyLabel.text = rateItem.currencyCode
-        rateLabel.text = rateItem.value.toDigits(4)
-        countryLabel.text = rateItem.countryName
+    func bindViewModel(_ viewModel: ExchangeRateCellViewModel) {
+        self.viewModel = viewModel
+        
+        currencyLabel.text = viewModel.rateItem.currencyCode
+        rateLabel.text = viewModel.rateItem.value.toDigits(4)
+        countryLabel.text = viewModel.rateItem.countryName
+
+        viewModel.$isFavorite
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] in
+                    let image = $0 ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+                    self?.favoriteButton.setImage(image, for: .normal)
+                }
+                .store(in: &cancellables)
     }
 }
+

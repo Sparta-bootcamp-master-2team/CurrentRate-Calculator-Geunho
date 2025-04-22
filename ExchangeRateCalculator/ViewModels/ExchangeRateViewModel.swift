@@ -7,10 +7,14 @@
 
 import Foundation
 
-final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
+final class ExchangeRateViewModel: ViewModelProtocol {
+    
+    private let coreData = CoreDataManager()
+    private var favoriteCodes = [String]()
     
     init() {
-        print(#function)
+        // 즐겨찾기된 currencyCode 저장
+        favoriteCodes = coreData.readAllData()
     }
     
     typealias Action = ExchangeRateAction
@@ -19,10 +23,8 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
     var action: ((ExchangeRateAction) -> Void)?
     
     @Published var state: ExchangeRateState = .idle
-    @Published var rateItems = [RateItem]()
-    @Published var tempRateItems = [RateItem]()
-    // Test
-    @Published var titleText: String = "환율 정보"
+    var rateItems = [RateItem]()
+    var allRateItems = [RateItem]()
     
     func setExchangeRate(_ action: ExchangeRateAction) {
         
@@ -34,13 +36,16 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let response):
+                        
                         let items = response.rates.map {
                             RateItem(currencyCode: $0.key, value: $0.value)
-                        }.sorted { $0.currencyCode < $1.currencyCode }
+                        }.sorted {
+                            $0.currencyCode < $1.currencyCode
+                        }
                         
-                        self.rateItems = items
-                        self.tempRateItems = items
-                        self.state = .loaded(items)
+                        self.allRateItems = items
+                        self.fetchFavorites(self.favoriteCodes)
+                        self.state = .loaded(self.rateItems)
                         
                     case .failure(let error):
                         print("데이터 로드 실패: \(error)")
@@ -49,16 +54,65 @@ final class ExchangeRateViewModel: ViewModelProtocol, ObservableObject {
                 }
             }
         case .filter(let text):
-            guard !text.isEmpty else {
-                self.rateItems = tempRateItems
-                return
-            }
-            
-            self.rateItems = tempRateItems.filter {
-                // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
-                return $0.currencyCode.localizedCaseInsensitiveContains(text) ||
-                $0.countryName.localizedCaseInsensitiveContains(text)
+            if text.isEmpty {
+                self.rateItems = allRateItems
+                self.state = .loaded(self.rateItems)
+            } else {
+                self.rateItems = allRateItems.filter {
+                    // localizedCaseInsensitiveContains -> 대소문자 구분 X, 현지화
+                    return $0.currencyCode.localizedCaseInsensitiveContains(text)
+                    || $0.countryName.localizedCaseInsensitiveContains(text)
+                }
+                self.state = .loaded(self.rateItems)
             }
         }
     }
+    
+    /// 각 요소에 즐겨찾기 상태 적용 (fetch 시 한 번), rateItems 설정
+    func fetchFavorites(_ favoriteCodes: [String]) {
+        for i in 0..<allRateItems.count {
+            if favoriteCodes.contains(allRateItems[i].currencyCode) {
+                allRateItems[i].isFavorite = true
+                print(allRateItems[i])
+            }
+        }
+        
+        allRateItems.sort {
+            if $0.isFavorite != $1.isFavorite {
+                return $0.isFavorite
+            }
+            return $0.currencyCode < $1.currencyCode
+        }
+        
+        // rateItems 값 업데이트
+        self.rateItems = allRateItems
+    }
+    
+    /// 클릭 시 즐겨찾기 상태 변경
+    func updateFavorite(currencyCode: String, isFavorite: Bool) {
+        if let index = allRateItems.firstIndex(where: { $0.currencyCode == currencyCode }) {
+            allRateItems[index].isFavorite = isFavorite
+        }
+        
+        if let index = rateItems.firstIndex(where: { $0.currencyCode == currencyCode}) {
+            rateItems[index].isFavorite = isFavorite
+        }
+        
+        allRateItems.sort {
+            if $0.isFavorite != $1.isFavorite {
+                return $0.isFavorite
+            }
+            return $0.currencyCode < $1.currencyCode
+        }
+        
+        rateItems.sort {
+            if $0.isFavorite != $1.isFavorite {
+                return $0.isFavorite
+            }
+            return $0.currencyCode < $1.currencyCode
+        }
+        // 업데이트 된 rateItems으로 reload
+        state = .loaded(rateItems)
+    }
 }
+

@@ -9,12 +9,19 @@ import Foundation
 
 struct ExchangeRateResponse: Codable {
     let rates: [String: Double]
+    let timeStamp: String
+    
+    enum CodingKeys: String, CodingKey {
+        case rates
+        case timeStamp = "time_last_update_utc"
+    }
 }
 
 // 각 Cell에 들어갈 환율 정보
 struct RateItem {
     let currencyCode: String
     var value: Double
+    var isFavorite: Bool = false
     var countryName: String {
         RateItem.countryMap[currencyCode] ?? "Unknown"
     }
@@ -184,5 +191,3 @@ struct RateItem {
                                 "ZMW": "잠비아",
                                 "ZWL": "짐바브웨"]
 }
-
-

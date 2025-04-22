@@ -55,6 +55,8 @@ final class ExchangeRateViewController: UIViewController {
     // MARK: - UI & Layout
     private func setUI() {
         view.backgroundColor = .systemBackground
+        self.title = "환율 정보"
+        
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         
@@ -77,29 +79,23 @@ final class ExchangeRateViewController: UIViewController {
         
         emptyTextLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.centerY.equalTo(tableView)
+            make.centerY.equalToSuperview()
         }
     }
     
-
+    
     // MARK: - Action
     /// 키보드 해제
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
-
+    
     // MARK: - Private Methods
     private func bindViewModel() {
-        print(#function)
-        
-        viewModel.$titleText
-            .sink {
-                self.title = $0
-            }.store(in: &cancellables)
         
         // 상태에 따라 emptyTextLabel 표시, Alert 표시 등 동작
         viewModel.$state
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 guard let self = self else { return }
                 
@@ -107,6 +103,7 @@ final class ExchangeRateViewController: UIViewController {
                 case .idle:
                     break
                 case .loaded(let items):
+                    // 검색 결과 없을 시 "검색 결과 없음" 표시
                     self.emptyTextLabel.isHidden = !items.isEmpty
                     self.tableView.reloadData()
                 case .error:
@@ -148,10 +145,20 @@ extension ExchangeRateViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let item = viewModel.rateItems[indexPath.row]
+        let cellViewModel = ExchangeRateCellViewModel(rateItem: item)
+        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateCell.id) as? ExchangeRateCell else {
             return UITableViewCell()
         }
-        cell.configure(rateItem: item)
+        cell.bindViewModel(cellViewModel)
+        
+        // 클릭 이벤트 받음(구독), 즐겨찾기 업데이트
+        cellViewModel.favoriteTogglePublisher
+            .sink { [weak self] (currencyCode, isFavorite) in
+                self?.viewModel.updateFavorite(currencyCode: currencyCode, isFavorite: isFavorite)
+            }
+            .store(in: &cancellables)
+        
         return cell
     }
 }
@@ -164,10 +171,6 @@ extension ExchangeRateViewController: UISearchBarDelegate {
         viewModel.setExchangeRate(.filter(text))
         
         self.tableView.reloadData()
-    }
-    
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        dismissKeyboard()
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {

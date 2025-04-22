@@ -42,12 +42,15 @@ final class CalculatorViewController: UIViewController {
         textField.keyboardType = .decimalPad
         textField.textAlignment = .center
         textField.placeholder = "금액을 입력하세요"
+        textField.addTarget(self, action: #selector(didTextFieldChanged(_:)), for: .editingChanged)
+        
         return textField
     }()
     
     private lazy var convertButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = .systemBlue
+        button.isEnabled = false
+        button.backgroundColor = .systemGray
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitle("환율 계산", for: .normal)
         button.layer.cornerRadius = 8
@@ -71,7 +74,6 @@ final class CalculatorViewController: UIViewController {
         setLayout()
         setupTapGesture()
         bindViewModel()
-        viewModel.configure()
     }
     
     // MARK: - Initializers
@@ -133,49 +135,62 @@ final class CalculatorViewController: UIViewController {
     
     @objc func convertButtonClicked() {
         
-        guard let amount = Double(amountTextField.text ?? "") else {
-            self.showAlert(alertTitle: "오류", message: "올바른 숫자를 입력해주세요", actionTitle: "확인")
+        guard
+            let input = amountTextField.text,
+            let validatedInput = validateInput(input)
+        else {
+            amountTextField.text = ""
+            viewModel.textInput = ""
+            resultLabel.text = ""
+            viewModel.resultText = ""
             return
         }
-        
-        viewModel.setNewExchangeRate(amount)
+        viewModel.setNewExchangeRate(validatedInput)
+    }
+    
+    @objc func didTextFieldChanged(_ sender: UITextField) {
+        viewModel.textInput = sender.text ?? ""
     }
     
     // MARK: - Private Methods
     private func bindViewModel() {
         
-        // Caculator View 정보 설정
-        viewModel.$resultText
-            .receive(on: RunLoop.main)
-            .assign(to: \.text, on: resultLabel)
+        currencyLabel.text = viewModel.rateItem.currencyCode
+        countryLabel.text = viewModel.rateItem.countryName
+        
+        viewModel.isButtonEnabled
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isEnabled in
+                self?.convertButton.isEnabled = isEnabled
+                self?.convertButton.backgroundColor = isEnabled ? .systemBlue : .lightGray
+            }
             .store(in: &cancellables)
         
-        viewModel.$currencyLabelText
-            .receive(on: RunLoop.main)
-            .assign(to: \.text, on: currencyLabel)
-            .store(in: &cancellables)
-        
-        viewModel.$countryLabelText
-            .receive(on: RunLoop.main)
-            .assign(to: \.text, on: countryLabel)
-            .store(in: &cancellables)
-        
-        
-        // 상태에 따라 Alert 표시 
+        // 상태에 따라 Alert 표시
         viewModel.$state
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 guard let self = self else { return }
                 
                 switch state {
-                case .idle:
-                    break
-                case .loaded(let items):
-                    break
+                case .loaded(let result):
+                    self.resultLabel.text = result
                 case .error:
                     self.showAlert(alertTitle: "오류", message: "데이터를 불러올 수 없습니다", actionTitle: "확인")
                 }
             }.store(in: &cancellables)
+    }
+    
+    private func validateInput(_ text: String) -> Double? {
+        
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard let trimmedText = Double(trimmedText) else {
+            self.showAlert(alertTitle: "오류", message: "올바른 숫자를 입력해주세요", actionTitle: "확인")
+            return nil
+        }
+        
+        return trimmedText
     }
     
     /// TapGesture 추가, tapGesture.cancelsTouchesInView = false로 뷰 내 터치 정상적으로 동작
@@ -185,5 +200,3 @@ final class CalculatorViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
 }
-
-

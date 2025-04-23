@@ -21,14 +21,14 @@ final class ExchangeRateCell: UITableViewCell {
     private lazy var currencyLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .medium)
-        label.textColor = .label
+        label.textColor = UIColor(named: AppColor.textColor)
         return label
     }()
     
     private lazy var countryLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14)
-        label.textColor = .secondaryLabel
+        label.textColor = UIColor(named: AppColor.secondaryTextColor)
         return label
     }()
     
@@ -42,7 +42,7 @@ final class ExchangeRateCell: UITableViewCell {
     private lazy var rateLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16)
-        label.textColor = .label
+        label.textColor = UIColor(named: AppColor.textColor)
         label.textAlignment = .right
         return label
     }()
@@ -75,7 +75,7 @@ final class ExchangeRateCell: UITableViewCell {
     
     // MARK: - UI & Layout
     private func setUI() {
-        contentView.backgroundColor = .systemBackground
+        contentView.backgroundColor = UIColor(named: AppColor.cellBackgroundColor)
         
         [labelStackView, rateLabel, iconImageView, favoriteButton].forEach {
             contentView.addSubview($0)

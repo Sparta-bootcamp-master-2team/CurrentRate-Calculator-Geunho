@@ -76,6 +76,13 @@ final class CalculatorViewController: UIViewController {
         bindViewModel()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        LastScreenDataManager.shared.saveLastScreen(
+            name: "CaculatorView \(String(describing: currencyLabel.text!)) \(String(describing: viewModel.rateItem.value))")
+    }
+    
     // MARK: - Initializers
     init(viewModel: CalculatorViewModel) {
         self.viewModel = viewModel

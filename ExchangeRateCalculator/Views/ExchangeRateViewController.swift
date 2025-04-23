@@ -45,12 +45,19 @@ final class ExchangeRateViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("메인뷰로드")
         
         setUI()
         setLayout()
         bindViewModel()
         viewModel.setExchangeRate(.fetch)
         setupTapGesture()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        LastScreenDataManager.shared.saveLastScreen(name: "ExchangeRateView")
     }
     
     // MARK: - UI & Layout

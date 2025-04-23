@@ -8,6 +8,9 @@
     <entity name="Favorites" representedClassName="Favorites" syncable="YES">
         <attribute name="currencyCode" optional="YES" attributeType="String"/>
     </entity>
+    <entity name="LastScreen" representedClassName="LastScreen" syncable="YES">
+        <attribute name="name" attributeType="String"/>
+    </entity>
     <entity name="OldCachedRate" representedClassName="OldCachedRate" syncable="YES">
         <attribute name="currencyCode" optional="YES" attributeType="String"/>
         <attribute name="rate" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>

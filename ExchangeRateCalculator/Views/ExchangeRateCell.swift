@@ -54,6 +54,12 @@ final class ExchangeRateCell: UITableViewCell {
         return button
     }()
     
+    private lazy var iconImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
     
     // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -71,7 +77,7 @@ final class ExchangeRateCell: UITableViewCell {
     private func setUI() {
         contentView.backgroundColor = .systemBackground
         
-        [labelStackView, rateLabel, favoriteButton].forEach {
+        [labelStackView, rateLabel, iconImageView, favoriteButton].forEach {
             contentView.addSubview($0)
         }
     }
@@ -84,10 +90,17 @@ final class ExchangeRateCell: UITableViewCell {
         }
         
         rateLabel.snp.makeConstraints { make in
-            make.trailing.equalTo(favoriteButton.snp.leading).offset(-16)
+            make.trailing.equalTo(iconImageView.snp.leading).offset(-8)
             make.centerY.equalToSuperview()
             make.leading.greaterThanOrEqualTo(labelStackView.snp.trailing).offset(16)
             make.width.equalTo(120)
+        }
+        
+        iconImageView.snp.makeConstraints { make in
+            make.leading.equalTo(rateLabel.snp.trailing).offset(8)
+            make.trailing.equalTo(favoriteButton.snp.leading).offset(-8)
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(24)
         }
         
         favoriteButton.snp.makeConstraints { make in
@@ -107,6 +120,20 @@ final class ExchangeRateCell: UITableViewCell {
         self.viewModel = viewModel
         
         currencyLabel.text = viewModel.rateItem.currencyCode
+        rateLabel.text = String(format: "%.2f", viewModel.rateItem.value)
+        
+        switch viewModel.rateItem.change {
+        case .up:
+            iconImageView.image = UIImage(systemName: "arrow.up")
+            iconImageView.tintColor = .systemRed
+        case .down:
+            iconImageView.image = UIImage(systemName: "arrow.down")
+            iconImageView.tintColor = .systemBlue
+        case .same:
+            iconImageView.image = nil
+        }
+        
+        currencyLabel.text = viewModel.rateItem.currencyCode
         rateLabel.text = viewModel.rateItem.value.toDigits(4)
         countryLabel.text = viewModel.rateItem.countryName
 
@@ -117,8 +144,6 @@ final class ExchangeRateCell: UITableViewCell {
                     self?.favoriteButton.setImage(image, for: .normal)
                 }
                 .store(in: &cancellables)
-        
-        
     }
 }
 

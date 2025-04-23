@@ -26,7 +26,6 @@ final class LastScreenDataManager {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
         _ = try? container.viewContext.execute(deleteRequest)
         
-        
         guard let entity = NSEntityDescription.entity(forEntityName: "LastScreen", in: self.container.viewContext) else { return }
         
         // 새 데이터 저장
@@ -36,19 +35,20 @@ final class LastScreenDataManager {
         do {
             try self.container.viewContext.save()
             print("화면 저장 성공")
+            print(screen)
         } catch {
             print("화면 저장 실패")
         }
     }
     
     func loadLastScreen() -> String? {
-        var lastScreen: String?
         
         do {
             let lastScreen = try self.container.viewContext.fetch(LastScreen.fetchRequest())
+            return lastScreen.first?.name
         } catch {
             print("읽기 실패")
+            return nil
         }
-        return lastScreen
     }
 }

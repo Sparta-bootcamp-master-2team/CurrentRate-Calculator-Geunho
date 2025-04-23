@@ -18,6 +18,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
 
     private var favoriteCodes = [String]()
     
+    // 현재 timeStamp
     var currentTimeStamp: Int64 = 0
 
     
@@ -25,11 +26,16 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         // 즐겨찾기된 currencyCode 저장
         favoriteCodes = favoritesDataManager.readAllData()
         
+        // 캐시 데이터에서 timeStamp 불러옴
         currentTimeStamp = cachedDataManager.loadCachedRates().timeStamp
         
+        // 캐시 데이터
         cachedData = cachedDataManager.loadCachedRates()
         
+        // 테스트 위해 Old에 MockData 저장
         oldCachedDataManager.saveRates(MockData().rates, timeStamp: MockData().timeStamp)
+        
+        // 이전 데이터 (Old)
         oldCachedData = oldCachedDataManager.loadCachedRates()
     }
     
@@ -59,7 +65,9 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                             $0.currencyCode < $1.currencyCode
                         }
                         
+                        // 받아오는 데이터의 timeStamp와 현재 timeStamp 비교
                         if response.timeStamp > self.currentTimeStamp {
+                            // Old에 기존 cachedData 저장
                             self.oldCachedDataManager.saveRates(self.cachedData.rates, timeStamp: self.cachedData.timeStamp)
                             
                             items = self.compareWithPreviousRates(rates: response.rates)
@@ -68,9 +76,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                             self.cachedDataManager.saveRates(response.rates, timeStamp: response.timeStamp)
                             
                             self.currentTimeStamp = response.timeStamp
-                            print(response.timeStamp, self.currentTimeStamp)
                         } else {
-                            print(response.timeStamp, self.currentTimeStamp)
+                            // timeStamp 변경 없을 시 기존 Old와 cachedData 비교
                             items = self.compareWithPreviousRates(rates: self.cachedData.rates)
                         }
                         
@@ -105,7 +112,6 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         for i in 0..<allRateItems.count {
             if favoriteCodes.contains(allRateItems[i].currencyCode) {
                 allRateItems[i].isFavorite = true
-                print(allRateItems[i])
             }
         }
         
@@ -164,7 +170,6 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             }
             result.append(RateItem(currencyCode: code, value: newValue, change: direction))
         }
-        
         return result
     }
 }

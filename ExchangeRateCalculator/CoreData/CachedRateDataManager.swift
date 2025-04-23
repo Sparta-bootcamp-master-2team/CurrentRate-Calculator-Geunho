@@ -21,7 +21,11 @@ final class CachedRateDataManager {
         // 기존 데이터 삭제
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = CachedRate.fetchRequest()
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-        try? container.viewContext.execute(deleteRequest)
+        do {
+            try container.viewContext.execute(deleteRequest)
+        } catch {
+            print("기존 데이터 삭제 실패")
+        }
         
         // 새 데이터 설정
         for (currencyCode, rate) in rateDatas {

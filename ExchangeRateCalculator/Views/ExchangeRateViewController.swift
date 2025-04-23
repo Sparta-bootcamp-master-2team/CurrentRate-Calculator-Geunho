@@ -30,6 +30,7 @@ final class ExchangeRateViewController: UIViewController {
         tableView.dataSource = self
         // 테이블 뷰에다가 테이블 뷰 셀 등록
         tableView.register(ExchangeRateCell.self, forCellReuseIdentifier: ExchangeRateCell.id)
+        tableView.separatorStyle = .none
         return tableView
     }()
     
@@ -37,7 +38,7 @@ final class ExchangeRateViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16)
         label.text = "검색 결과 없음"
-        label.textColor = .secondaryLabel
+        label.textColor = UIColor(named: AppColor.secondaryTextColor)
         label.isHidden = true
         return label
     }()
@@ -54,7 +55,7 @@ final class ExchangeRateViewController: UIViewController {
     
     // MARK: - UI & Layout
     private func setUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(named: AppColor.backgroundColor)
         self.title = "환율 정보"
         
         

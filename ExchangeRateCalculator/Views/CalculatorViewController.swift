@@ -32,7 +32,7 @@ final class CalculatorViewController: UIViewController {
     private lazy var countryLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16)
-        label.textColor = .secondaryLabel
+        label.textColor = UIColor(named: AppColor.textColor)
         return label
     }()
     
@@ -50,7 +50,7 @@ final class CalculatorViewController: UIViewController {
     private lazy var convertButton: UIButton = {
         let button = UIButton()
         button.isEnabled = false
-        button.backgroundColor = .systemGray
+        button.backgroundColor = .lightGray
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitle("환율 계산", for: .normal)
         button.layer.cornerRadius = 8
@@ -88,7 +88,7 @@ final class CalculatorViewController: UIViewController {
     
     // MARK: - UI & Layout
     private func setUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = UIColor(named: AppColor.backgroundColor)
         title = "환율 계산기"
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
@@ -162,7 +162,7 @@ final class CalculatorViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isEnabled in
                 self?.convertButton.isEnabled = isEnabled
-                self?.convertButton.backgroundColor = isEnabled ? .systemBlue : .lightGray
+                self?.convertButton.backgroundColor = isEnabled ? UIColor(named: AppColor.buttonColor) : .lightGray
             }
             .store(in: &cancellables)
         

@@ -10,7 +10,7 @@ import Combine
 
 class ExchangeRateCellViewModel {
     
-    private let coreData = CoreDataManager()
+    private let favoritesData = FavoritesDataManager()
     @Published var rateItem: RateItem
     @Published var isFavorite: Bool
     
@@ -27,9 +27,9 @@ class ExchangeRateCellViewModel {
         rateItem.isFavorite.toggle()
         self.isFavorite = rateItem.isFavorite
         if rateItem.isFavorite {
-            coreData.createData(currencyCode: rateItem.currencyCode)
+            favoritesData.createData(currencyCode: rateItem.currencyCode)
         } else {
-            coreData.deleteData(selectedCode: rateItem.currencyCode)
+            favoritesData.deleteData(selectedCode: rateItem.currencyCode)
         }
         // 클릭 이벤트 send (ExchangeRateViewController: UITableViewDataSource에서 받음)
         favoriteTogglePublisher.send((rateItem.currencyCode, rateItem.isFavorite))

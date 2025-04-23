@@ -9,14 +9,10 @@
 /* Begin PBXBuildFile section */
 		66210FC02DB149BD00B4CD4C /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 66210FBF2DB149BD00B4CD4C /* Alamofire */; };
 		66210FC32DB149CC00B4CD4C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 66210FC22DB149CC00B4CD4C /* SnapKit */; };
-		66BFBB542DB4CBD7005807AD /* Favorites+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BFBB532DB4CBD7005807AD /* Favorites+CoreDataProperties.swift */; };
-		66BFBB552DB4CBD7005807AD /* Favorites+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BFBB522DB4CBD7005807AD /* Favorites+CoreDataClass.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		665575742DAE2221008F4A35 /* ExchangeRateCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExchangeRateCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		66BFBB522DB4CBD7005807AD /* Favorites+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Favorites+CoreDataClass.swift"; sourceTree = "<group>"; };
-		66BFBB532DB4CBD7005807AD /* Favorites+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Favorites+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -56,8 +52,6 @@
 		6655756B2DAE2221008F4A35 = {
 			isa = PBXGroup;
 			children = (
-				66BFBB522DB4CBD7005807AD /* Favorites+CoreDataClass.swift */,
-				66BFBB532DB4CBD7005807AD /* Favorites+CoreDataProperties.swift */,
 				665575762DAE2221008F4A35 /* ExchangeRateCalculator */,
 				665575752DAE2221008F4A35 /* Products */,
 			);
@@ -151,8 +145,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66BFBB542DB4CBD7005807AD /* Favorites+CoreDataProperties.swift in Sources */,
-				66BFBB552DB4CBD7005807AD /* Favorites+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

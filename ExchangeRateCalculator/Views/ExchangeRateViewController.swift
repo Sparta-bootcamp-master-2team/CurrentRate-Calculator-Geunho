@@ -30,6 +30,7 @@ final class ExchangeRateViewController: UIViewController {
         tableView.dataSource = self
         // 테이블 뷰에다가 테이블 뷰 셀 등록
         tableView.register(ExchangeRateCell.self, forCellReuseIdentifier: ExchangeRateCell.id)
+        tableView.separatorStyle = .none
         return tableView
     }()
     

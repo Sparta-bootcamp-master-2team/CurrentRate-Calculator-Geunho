@@ -9,12 +9,17 @@ import Foundation
 
 final class ExchangeRateViewModel: ViewModelProtocol {
     
-    private let coreData = FavoritesDataManager()
+    private let favoritesData = FavoritesDataManager()
+    private let cachedData = CachedRateDataManager()
     private var favoriteCodes = [String]()
+    var currentTimeStamp: Int64 = 0
+
     
     init() {
         // 즐겨찾기된 currencyCode 저장
-        favoriteCodes = coreData.readAllData()
+        favoriteCodes = favoritesData.readAllData()
+        
+        currentTimeStamp = cachedData.loadCachedRates().timeStamp
     }
     
     typealias Action = ExchangeRateAction
@@ -33,19 +38,25 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             NetworkManager.shared.fetchData { [weak self] (result: Result<ExchangeRateResponse, Error>) in
                 guard let self = self else { return }
                                 
-                DispatchQueue.main.async {
+                DispatchQueue.main.async { [self] in
                     switch result {
                     case .success(let response):
                         
-                        let items = response.rates.map {
+                        var items = response.rates.map {
                             RateItem(currencyCode: $0.key, value: $0.value)
                         }.sorted {
                             $0.currencyCode < $1.currencyCode
                         }
                         
+                        if response.timeStamp > self.currentTimeStamp {
+                            items = self.compareWithPreviousRates(newRates: response.rates)
+                        }
                         self.allRateItems = items
                         self.fetchFavorites(self.favoriteCodes)
                         self.state = .loaded(self.rateItems)
+                        
+                        // 캐시에 새 데이터 저장 (새로운 timeStamp일 때)
+                        self.cachedData.saveRates(MockData().rates, timeStamp: MockData().timeStamp)
                         
                     case .failure(let error):
                         print("데이터 로드 실패: \(error)")
@@ -115,14 +126,25 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         state = .loaded(rateItems)
     }
     
-    func compareWithPrevData(old: MockData, new: ExchangeRateResponse){
-        for i in old.rates.indices {
-            if abs(new.rates[i].value - old.rates[i].value) > 0.01 {
-                
+    /// 이전 환율데이터와 비교하여 아이콘 표시 기준(ChangeDirection) 설정
+    func compareWithPreviousRates(newRates: [String: Double]) -> [RateItem] {
+        let cachedRates = cachedData.loadCachedRates().rates
+        var result: [RateItem] = []
+        
+        for (code, newValue) in newRates {
+            let oldValue = cachedRates[code] ?? newValue
+            let diff = abs(newValue - oldValue)
+            
+            let direction: ChangeDirection
+            if diff <= 0.01 {
+                direction = .same
             } else {
-                
+                direction = newValue > oldValue ? .up : .down
             }
+            result.append(RateItem(currencyCode: code, value: newValue, change: direction))
         }
+        
+        return result
     }
 }
 

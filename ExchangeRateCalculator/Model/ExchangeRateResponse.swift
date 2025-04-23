@@ -8,9 +8,11 @@
 import Foundation
 
 struct ExchangeRateResponse: Codable {
+    let timeStamp: Int64
     let rates: [String: Double]
-    
+
     enum CodingKeys: String, CodingKey {
         case rates
+        case timeStamp = "time_last_update_unix"
     }
 }

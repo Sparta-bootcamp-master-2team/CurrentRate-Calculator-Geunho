@@ -9,17 +9,28 @@ import Foundation
 
 final class ExchangeRateViewModel: ViewModelProtocol {
     
-    private let favoritesData = FavoritesDataManager()
-    private let cachedData = CachedRateDataManager()
+    private let favoritesDataManager = FavoritesDataManager()
+    private let cachedDataManager = CachedRateDataManager()
+    private let oldCachedDataManager = OldCachedRateDataManager()
+    
+    private let cachedData: ExchangeRateResponse
+    private let oldCachedData: ExchangeRateResponse
+
     private var favoriteCodes = [String]()
+    
     var currentTimeStamp: Int64 = 0
 
     
     init() {
         // 즐겨찾기된 currencyCode 저장
-        favoriteCodes = favoritesData.readAllData()
+        favoriteCodes = favoritesDataManager.readAllData()
         
-        currentTimeStamp = cachedData.loadCachedRates().timeStamp
+        currentTimeStamp = cachedDataManager.loadCachedRates().timeStamp
+        
+        cachedData = cachedDataManager.loadCachedRates()
+        
+        oldCachedDataManager.saveRates(MockData().rates, timeStamp: MockData().timeStamp)
+        oldCachedData = oldCachedDataManager.loadCachedRates()
     }
     
     typealias Action = ExchangeRateAction
@@ -49,14 +60,24 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                         }
                         
                         if response.timeStamp > self.currentTimeStamp {
-                            items = self.compareWithPreviousRates(newRates: response.rates)
+                            self.oldCachedDataManager.saveRates(self.cachedData.rates, timeStamp: self.cachedData.timeStamp)
+                            
+                            items = self.compareWithPreviousRates(rates: response.rates)
+                            
+                            // 캐시에 새 데이터 저장 (새로운 timeStamp일 때)
+                            self.cachedDataManager.saveRates(response.rates, timeStamp: response.timeStamp)
+                            
+                            self.currentTimeStamp = response.timeStamp
+                            print(response.timeStamp, self.currentTimeStamp)
+                        } else {
+                            print(response.timeStamp, self.currentTimeStamp)
+                            items = self.compareWithPreviousRates(rates: self.cachedData.rates)
                         }
+                        
                         self.allRateItems = items
                         self.fetchFavorites(self.favoriteCodes)
                         self.state = .loaded(self.rateItems)
                         
-                        // 캐시에 새 데이터 저장 (새로운 timeStamp일 때)
-                        self.cachedData.saveRates(MockData().rates, timeStamp: MockData().timeStamp)
                         
                     case .failure(let error):
                         print("데이터 로드 실패: \(error)")
@@ -127,12 +148,12 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     }
     
     /// 이전 환율데이터와 비교하여 아이콘 표시 기준(ChangeDirection) 설정
-    func compareWithPreviousRates(newRates: [String: Double]) -> [RateItem] {
-        let cachedRates = cachedData.loadCachedRates().rates
+    func compareWithPreviousRates(rates: [String: Double]) -> [RateItem] {
+        let oldCachedRates = oldCachedData.rates
         var result: [RateItem] = []
         
-        for (code, newValue) in newRates {
-            let oldValue = cachedRates[code] ?? newValue
+        for (code, newValue) in rates {
+            let oldValue = oldCachedRates[code] ?? newValue
             let diff = abs(newValue - oldValue)
             
             let direction: ChangeDirection

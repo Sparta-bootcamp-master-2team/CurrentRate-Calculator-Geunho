@@ -1,14 +1,14 @@
 //
-//  CachedRateDataManager.swift
+//  OldCachedRateDataManager.swift
 //  ExchangeRateCalculator
 //
-//  Created by 정근호 on 4/22/25.
+//  Created by 정근호 on 4/23/25.
 //
 
 import CoreData
 import UIKit
 
-final class CachedRateDataManager {
+final class OldCachedRateDataManager {
     
     private let container: NSPersistentContainer
     
@@ -19,13 +19,13 @@ final class CachedRateDataManager {
     func saveRates(_ rateDatas: [String: Double], timeStamp: Int64) {
         
         // 기존 데이터 삭제
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = CachedRate.fetchRequest()
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = OldCachedRate.fetchRequest()
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         try? container.viewContext.execute(deleteRequest)
         
         // 새 데이터 설정
         for (currencyCode, rate) in rateDatas {
-            guard let entity = NSEntityDescription.entity(forEntityName: "CachedRate", in: self.container.viewContext) else { continue }
+            guard let entity = NSEntityDescription.entity(forEntityName: "OldCachedRate", in: self.container.viewContext) else { continue }
             let cachedRate = NSManagedObject(entity: entity, insertInto: self.container.viewContext)
             cachedRate.setValue(currencyCode, forKey: "currencyCode")
             cachedRate.setValue(rate, forKey: "rate")
@@ -46,7 +46,7 @@ final class CachedRateDataManager {
         var rates: [String: Double] = [:]
         
         do {
-            let request: NSFetchRequest<CachedRate> = CachedRate.fetchRequest()
+            let request: NSFetchRequest<OldCachedRate> = OldCachedRate.fetchRequest()
             let cachedDatas = try self.container.viewContext.fetch(request)
             for cachedData in cachedDatas {
                 if let code = cachedData.currencyCode {

@@ -1,5 +1,5 @@
 # 환율계산기
-실시간 환율 정보(USD 기준)를 Open API(https://open.er-api.com/v6/latest/USD)로 받아오고, 금액을 변환하거나, 관심 있는 통화를 즐겨찾기에 추가할 수 있는 앱. 
+실시간 환율 정보(USD 기준)를 Open API (https://open.er-api.com/v6/latest/USD) 로 받아오고, 금액을 변환하거나, 관심 있는 통화를 즐겨찾기에 추가할 수 있는 앱. 
 <br>
 
 

@@ -33,7 +33,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         cachedData = cachedDataManager.loadCachedRates()
         
         // 테스트 위해 Old에 MockData 저장
-        oldCachedDataManager.saveRates(MockData().rates, timeStamp: MockData().timeStamp)
+//        oldCachedDataManager.saveRates(MockData().rates, timeStamp: MockData().timeStamp)
         
         // 이전 데이터 (Old)
         oldCachedData = oldCachedDataManager.loadCachedRates()

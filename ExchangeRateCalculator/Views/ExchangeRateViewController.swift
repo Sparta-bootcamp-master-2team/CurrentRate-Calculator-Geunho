@@ -137,6 +137,9 @@ extension ExchangeRateViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // 셀 셀렉션 효과(터치 자국) 제거 
+        tableView.deselectRow(at: indexPath, animated: true)
+
         // CalculatorView, CalculatorViewModel 생성
         let calculatorViewModel = CalculatorViewModel(rateItem: viewModel.rateItems[indexPath.row])
         

@@ -13,6 +13,6 @@ struct ExchangeRateResponse: Codable {
 
     enum CodingKeys: String, CodingKey {
         case rates
-        case timeStamp = "time_last_update_unix"
+        case timeStamp = "time_next_update_unix"
     }
 }
